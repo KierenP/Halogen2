@@ -8,7 +8,7 @@ void PerftSuite();
 void PrintVersion();
 uint64_t PerftDivide(unsigned int depth, Position& position);
 uint64_t Perft(unsigned int depth, Position& position);
-void Bench();
+void Bench(int depth = 16);
 
 string version = "9";  
 
@@ -36,9 +36,13 @@ int main(int argc, char* argv[])
 
 	unsigned int ThreadCount = 1;
 
-	if (argc == 2 && strcmp(argv[1], "bench") == 0) { Bench(); return 0; }	//currently only supports bench from command line for openBench integration
+	for (int i = 1; i < argc; i++)	//read any command line input as a regular UCI instruction
+	{
+		Line += argv[i];
+		Line += " ";
+	}
 
-	while (getline(cin, Line))
+	while (Line != "" || getline(cin, Line))
 	{
 		istringstream iss(Line);
 		string token;
@@ -157,7 +161,7 @@ int main(int argc, char* argv[])
 			if (searchThread.joinable())
 				searchThread.join();
 
-			searchThread = thread([=, &limits, &position] {SearchThread(position, ThreadCount, limits); });
+			searchThread = thread([=, &position] {SearchThread(position, ThreadCount, limits); });
 		}
 
 		else if (token == "setoption")
@@ -280,11 +284,26 @@ int main(int argc, char* argv[])
 			return 0;
 		}
 
+		else if (token == "bench")
+		{
+			if (iss >> token)
+				Bench(stoi(token));
+			else
+				Bench();
+		}
+
 		//Non uci commands
 		else if (token == "print") position.Print();
-		else if (token == "bench") Bench();
 		else cout << "Unknown command" << endl;
+
+		Line = "";
+
+		if (argc != 1)	//Temporary fix to quit after a command line UCI argument is done
+			break;
 	}
+
+	if (searchThread.joinable())
+		searchThread.join();
 
 	return 0;
 }
@@ -449,7 +468,7 @@ uint64_t Perft(unsigned int depth, Position& position)
 	return nodeCount;
 }
 
-void Bench()
+void Bench(int depth)
 {
 	Timer timer;
 	timer.Start();
@@ -466,7 +485,7 @@ void Bench()
 		}
 
 		SearchLimits limits;
-		limits.SetDepthLimit(16);
+		limits.SetDepthLimit(depth);
 		tTable.ResetTable();
 		nodeCount += SearchThread(position, 1, limits);
 	}
