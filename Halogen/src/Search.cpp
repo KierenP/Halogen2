@@ -107,7 +107,7 @@ void InitSearch()
 	{
 		for (int j = 0; j < 64; j++)
 		{
-			LMR_reduction[i][j] = std::round(LMR_constant + LMR_coeff * log(i + 1) * log(j + 1));
+			LMR_reduction[i][j] = std::max<int>(1, std::round(LMR_constant + LMR_coeff * log(i + 1) * log(j + 1)));
 		}
 	}
 }
@@ -303,14 +303,14 @@ SearchResult AspirationWindowSearch(Position& position, int depth, int prevScore
 
 SearchResult NegaScout(Position& position, unsigned int initialDepth, int depthRemaining, int alpha, int beta, int colour, unsigned int distanceFromRoot, bool allowedNull, SearchData& locals, ThreadSharedData& sharedData)
 {
-	//Set up search
-	locals.PvTable[distanceFromRoot].clear();
 	position.ReportDepth(distanceFromRoot);
 
 	//See if we should abort the search
 	if (initialDepth > 1 && locals.limits.CheckTimeLimit()) return -1;	//Am I out of time?
 	if (sharedData.ThreadAbort(initialDepth)) return -1;				//Has this depth been finished by another thread?
 	if (distanceFromRoot >= MAX_DEPTH) return 0;						//Have we reached max depth?
+
+	locals.PvTable[distanceFromRoot].clear();
 
 	//check for draw
 	if (DeadPosition(position)) return 0;
