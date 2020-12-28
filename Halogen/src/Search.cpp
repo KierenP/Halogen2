@@ -380,7 +380,13 @@ SearchResult NegaScout(Position& position, unsigned int initialDepth, int depthR
 	if (depthRemaining == 1 && staticScore - 200 >= beta && !InCheck && !IsPV(beta, alpha)) return beta;
 
 	//Null move pruning
-	if (AllowedNull(allowedNull, position, beta, alpha, InCheck) && (staticScore > beta))
+	if (   allowedNull
+		&& !InCheck
+		&& staticScore > beta
+		&& depthRemaining > 2
+		&& !IsPV(beta, alpha)
+		&& !IsEndGame(position)
+		&& GetBitCount(position.GetAllPieces()) >= 5) //avoid null move pruning in very late game positions due to zanauag issues. Even with verification search e.g 8/6k1/8/8/8/8/1K6/Q7 w - - 0 1
 	{
 		unsigned int reduction = Null_constant + depthRemaining / Null_depth_quotent + std::min(3, (staticScore - beta) / Null_beta_quotent);
 
@@ -694,15 +700,6 @@ bool IsFutile(Move move, int beta, int alpha, Position & position, bool IsInChec
 		&& !move.IsPromotion() 
 		&& !IsInCheck
 		&& !FutilityMoveGivesCheck(position, move);
-}
-
-bool AllowedNull(bool allowedNull, const Position& position, int beta, int alpha, bool InCheck)
-{
-	return allowedNull
-		&& !InCheck
-		&& !IsPV(beta, alpha)
-		&& !IsEndGame(position)
-		&& GetBitCount(position.GetAllPieces()) >= 5;	//avoid null move pruning in very late game positions due to zanauag issues. Even with verification search e.g 8/6k1/8/8/8/8/1K6/Q7 w - - 0 1 
 }
 
 bool IsEndGame(const Position& position)
