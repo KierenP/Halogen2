@@ -12,6 +12,7 @@
 
 extern double LMR_constant;
 extern double LMR_coeff;
+extern int LMR_min_moves;
 
 extern int Null_constant;				
 extern int Null_depth_quotent;				

@@ -215,6 +215,13 @@ int main(int argc, char* argv[])
 				LMR_coeff = stod(token);
 			}
 
+			else if (token == "LMR_min_moves")
+			{
+				iss >> token; //'value'
+				iss >> token;
+				LMR_min_moves = stoi(token);
+			}
+
 			else if (token == "Null_constant")
 			{
 				iss >> token; //'value'
