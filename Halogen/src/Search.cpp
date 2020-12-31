@@ -2,8 +2,8 @@
 
 /*Tuneable search constants*/
 
-double LMR_constant = -1.26;
-double LMR_coeff = 0.84;
+double LMR_constant = -0.91;
+double LMR_coeff = 0.73;
 
 int Null_constant = 4;
 int Null_depth_quotent = 6;
@@ -496,7 +496,7 @@ SearchResult NegaScout(Position& position, unsigned int initialDepth, int depthR
 		int extendedDepth = depthRemaining + extension(position, alpha, beta);
 
 		//late move reductions
-		if (i > 3)
+		if (i > 2)
 		{
 			int reduction = Reduction(depthRemaining, static_cast<int>(i));
 			int score = -NegaScout(position, initialDepth, extendedDepth - 1 - reduction, -a - 1, -a, -colour, distanceFromRoot + 1, true, locals, sharedData).GetScore();
