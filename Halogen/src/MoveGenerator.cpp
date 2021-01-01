@@ -6,6 +6,11 @@ MoveGenerator::MoveGenerator(Position& Position, int DistanceFromRoot, const Sea
 	stage = Stage::TT_MOVE;
 }
 
+void GetNextHighest(std::vector<Move>& v, std::vector<Move>::iterator& it)
+{
+	std::iter_swap(it, std::max_element(it, v.end()));
+}
+
 bool MoveGenerator::Next(Move& move)
 {
 	if (stage == Stage::TT_MOVE)
@@ -46,19 +51,22 @@ bool MoveGenerator::Next(Move& move)
 
 	if (stage == Stage::GIVE_GOOD_LOUD)
 	{
-		if (current != legalMoves.end() && current->orderScore >= 8000000)
+		if (current != legalMoves.end())
 		{
-			move = *current;
-			++current;
-			return true;
-		}
-		else
-		{
-			if (quiescence)
-				return false;
+			GetNextHighest(legalMoves, current);
 
-			stage = Stage::GIVE_KILLER_1;
+			if (current->orderScore >= 8000000)
+			{
+				move = *current;
+				++current;
+				return true;
+			}
 		}
+
+		if (quiescence)
+			return false;
+
+		stage = Stage::GIVE_KILLER_1;
 	}
 
 	if (stage == Stage::GIVE_KILLER_1)
@@ -89,6 +97,7 @@ bool MoveGenerator::Next(Move& move)
 	{
 		if (current != legalMoves.end())
 		{
+			GetNextHighest(legalMoves, current);
 			move = *current;
 			++current;
 			return true;
@@ -112,6 +121,7 @@ bool MoveGenerator::Next(Move& move)
 	{
 		if (current != legalMoves.end())
 		{
+			GetNextHighest(legalMoves, current);
 			move = *current;
 			++current;
 			return true;
@@ -119,14 +129,6 @@ bool MoveGenerator::Next(Move& move)
 	}
 
 	return false;
-}
-
-void selection_sort(std::vector<Move>& v)
-{
-	for (auto it = v.begin(); it != v.end(); ++it)
-	{
-		std::iter_swap(it, std::max_element(it, v.end()));
-	}
 }
 
 void MoveGenerator::OrderMoves(std::vector<Move>& moves)
@@ -210,8 +212,6 @@ void MoveGenerator::OrderMoves(std::vector<Move>& moves)
 			moves[i].orderScore = std::min(1000000U, locals.HistoryMatrix[position.GetTurn()][moves[i].GetFrom()][moves[i].GetTo()]);
 		}
 	}
-
-	selection_sort(moves);
 }
 
 Move GetHashMove(const Position& position, int depthRemaining, int distanceFromRoot)
