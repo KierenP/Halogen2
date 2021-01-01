@@ -186,21 +186,22 @@ void MoveGenerator::OrderMoves(std::vector<Move>& moves)
 		//Captures
 		else if (moves[i].IsCapture())
 		{
-			int SEE = 0;
+			int MVVLVA = 0;
 
 			if (moves[i].GetFlag() != EN_PASSANT)
 			{
-				SEE = seeCapture(position, moves[i]);
+				MVVLVA += PieceValues(position.GetSquare(moves[i].GetTo()));
+				MVVLVA -= PieceValues(position.GetSquare(moves[i].GetFrom()));
 			}
 
-			if (SEE >= 0)
+			if (MVVLVA >= 0)
 			{
-				moves[i].orderScore = 8000000 + SEE;
+				moves[i].orderScore = 8000000 + MVVLVA;
 			}
 
-			if (SEE < 0)
+			if (MVVLVA < 0)
 			{
-				moves[i].orderScore = 6000000 + SEE;
+				moves[i].orderScore = 6000000 + MVVLVA;
 			}
 		}
 
