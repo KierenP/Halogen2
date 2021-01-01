@@ -1,5 +1,8 @@
 #include "MoveGenerator.h"
 
+const int VictimScore[N_PIECES] = { 100, 200, 300, 400, 500, 600, 100, 200, 300, 400, 500, 600 };
+const int AttackerScore[N_PIECES] = { 1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6 };
+
 MoveGenerator::MoveGenerator(Position& Position, int DistanceFromRoot, const SearchData& Locals, bool Quiescence) :
 	position(Position), distanceFromRoot(DistanceFromRoot), locals(Locals), quiescence(Quiescence)
 {
@@ -46,19 +49,25 @@ bool MoveGenerator::Next(Move& move)
 
 	if (stage == Stage::GIVE_GOOD_LOUD)
 	{
-		if (current != legalMoves.end() && current->orderScore >= 8000000)
+		while (current != legalMoves.end())
 		{
-			move = *current;
-			++current;
-			return true;
+			if (seeCapture(position, *current) >= 0)
+			{
+				move = *current;
+				++current;
+				return true;
+			}
+			else
+			{
+				badCaptures.push_back(*current);
+				++current;
+			}
 		}
-		else
-		{
-			if (quiescence)
-				return false;
 
-			stage = Stage::GIVE_KILLER_1;
-		}
+		if (quiescence)
+			return false;
+
+		stage = Stage::GIVE_KILLER_1;
 	}
 
 	if (stage == Stage::GIVE_KILLER_1)
@@ -77,6 +86,7 @@ bool MoveGenerator::Next(Move& move)
 	{
 		Killer2 = locals.KillerMoves[distanceFromRoot][1];
 		stage = Stage::GIVE_BAD_LOUD;
+		current = badCaptures.begin();
 
 		if (MoveIsLegal(position, Killer2))
 		{
@@ -87,7 +97,7 @@ bool MoveGenerator::Next(Move& move)
 
 	if (stage == Stage::GIVE_BAD_LOUD)
 	{
-		if (current != legalMoves.end())
+		if (current != badCaptures.end())
 		{
 			move = *current;
 			++current;
@@ -190,19 +200,11 @@ void MoveGenerator::OrderMoves(std::vector<Move>& moves)
 
 			if (moves[i].GetFlag() != EN_PASSANT)
 			{
-				MVVLVA += PieceValues(position.GetSquare(moves[i].GetTo()));
-				MVVLVA -= PieceValues(position.GetSquare(moves[i].GetFrom()));
+				MVVLVA += VictimScore[position.GetSquare(moves[i].GetTo())];
+				MVVLVA -= AttackerScore[position.GetSquare(moves[i].GetFrom())];
 			}
 
-			if (MVVLVA >= 0)
-			{
-				moves[i].orderScore = 8000000 + MVVLVA;
-			}
-
-			if (MVVLVA < 0)
-			{
-				moves[i].orderScore = 6000000 + MVVLVA;
-			}
+			moves[i].orderScore = MVVLVA;
 		}
 
 		//Quiet

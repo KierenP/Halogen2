@@ -31,6 +31,7 @@ private:
 	//Data uses for keeping track of internal values
 	Stage stage;
 	std::vector<Move> legalMoves;
+	std::vector<Move> badCaptures;
 	std::vector<Move>::iterator current;
 
 	Move TTmove;
