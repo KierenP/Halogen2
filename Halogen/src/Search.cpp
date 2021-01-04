@@ -321,7 +321,7 @@ SearchResult NegaScout(Position& position, unsigned int initialDepth, int depthR
 			if (IsPV(beta, alpha))
 				reduction--;
 
-			if (move.IsCapture() || move.IsPromotion())
+			if (gen.CurrentStage() == Stage::GIVE_GOOD_LOUD)
 				reduction--;
 
 			reduction = std::max(0, reduction);

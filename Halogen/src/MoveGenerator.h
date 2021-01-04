@@ -19,6 +19,8 @@ public:
 	MoveGenerator(Position& Position, int DistanceFromRoot, const SearchData& Locals, bool Quiessence);
 	bool Next(Move& move);	//returns false if no more legal moves
 
+	Stage CurrentStage() { return stage; }
+
 private:
 	void OrderMoves(std::vector<Move>& moves);
 	
