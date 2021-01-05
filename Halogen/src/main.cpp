@@ -376,7 +376,12 @@ void TestSyzygy()
 	assert(TB_GET_WDL(result) == TB_BLESSED_LOSS);
 	assert(TB_GET_FROM(result) == SQ_C2);
 	assert(TB_GET_TO(result) == SQ_C1);
-	//assert(TB_GET_PROMOTES(result) == TB_PROMOTES_KNIGHT);
+
+	MoveFlag flag = QUIET;
+
+	int promo = TB_GET_PROMOTES(result);
+	PieceTypes promoPiece = promo ? static_cast<PieceTypes>(6 - promo) : N_PIECE_TYPES;
+	assert(promoPiece == KNIGHT);
 }
 
 void PerftSuite()
