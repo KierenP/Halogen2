@@ -115,6 +115,16 @@ uint64_t ThreadSharedData::getNodes() const
 	return ret;
 }
 
+int ThreadSharedData::GetSelDepth() const
+{
+	uint64_t ret = 0;
+
+	for (auto& x : threadlocalData)
+		ret += x.selDepth;
+
+	return ret;
+}
+
 SearchData& ThreadSharedData::GetData(unsigned int threadID)
 {
 	assert(threadID < threadlocalData.size());
@@ -124,7 +134,7 @@ SearchData& ThreadSharedData::GetData(unsigned int threadID)
 void ThreadSharedData::PrintSearchInfo(unsigned int depth, double Time, bool isCheckmate, int score, int alpha, int beta, const Position& position, const Move& move, const SearchData& locals) const
 {
 	/*
-	Here we avoid excessive use of std::cout and instead append to a string in order
+	Here we avoid excessive use of std::cout and instead append to a stringstream in order
 	to output only once at the end. This causes a noticeable speedup for very fast
 	time controls.
 	*/
@@ -136,8 +146,8 @@ void ThreadSharedData::PrintSearchInfo(unsigned int depth, double Time, bool isC
 
 	std::stringstream ss;
 
-	ss	<< "info depth " << depth							//the depth of search
-		<< " seldepth " << position.GetSelDepth();			//the selective depth (for example searching further for checks and captures)
+	ss	<< "info depth " << depth										//the depth of search
+		<< " seldepth " << GetSelDepth();								//the selective depth (for example searching further for checks and captures)
 
 	if (isCheckmate)
 	{
@@ -148,7 +158,7 @@ void ThreadSharedData::PrintSearchInfo(unsigned int depth, double Time, bool isC
 	}
 	else
 	{
-		ss << " score cp " << score;						//The score in hundreths of a pawn (a 1 pawn advantage is +100)	
+		ss << " score cp " << score;									//The score in hundreths of a pawn (a 1 pawn advantage is +100)	
 	}
 
 	if (score <= alpha)
@@ -156,10 +166,10 @@ void ThreadSharedData::PrintSearchInfo(unsigned int depth, double Time, bool isC
 	if (score >= beta)
 		ss << " lowerbound";
 
-	ss	<< " time " << Time																	//Time in ms
+	ss	<< " time " << Time												//Time in ms
 		<< " nodes " << getNodes()
 		<< " nps " << int(getNodes() / std::max(int(Time), 1) * 1000)
-		<< " hashfull " << tTable.GetCapacity(position.GetTurnCount())						//thousondths full
+		<< " hashfull " << tTable.GetCapacity(position.GetTurnCount())	//thousondths full
 		<< " tbhits " << getTBHits();
 
 	ss << " pv ";														//the current best line found

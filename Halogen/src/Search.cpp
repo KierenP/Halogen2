@@ -152,7 +152,6 @@ SearchResult AspirationWindowSearch(Position& position, int depth, int prevScore
 
 	while (true)
 	{
-		position.ResetSeldepth();
 		search = NegaScout(position, depth, depth, alpha, beta, position.GetTurn() ? 1 : -1, 0, false, locals, sharedData);
 
 		if (alpha < search.GetScore() && search.GetScore() < beta) break;
@@ -177,7 +176,7 @@ SearchResult AspirationWindowSearch(Position& position, int depth, int prevScore
 
 SearchResult NegaScout(Position& position, unsigned int initialDepth, int depthRemaining, int alpha, int beta, int colour, unsigned int distanceFromRoot, bool allowedNull, SearchData& locals, ThreadSharedData& sharedData)
 {
-	position.ReportDepth(distanceFromRoot);
+	locals.ReportDepth(distanceFromRoot);
 
 	if (distanceFromRoot >= MAX_DEPTH) return 0;						//Have we reached max depth?
 	locals.PvTable[distanceFromRoot].clear();
@@ -188,7 +187,6 @@ SearchResult NegaScout(Position& position, unsigned int initialDepth, int depthR
 	if (DeadPosition(position)) return 0;								//Is this position a dead draw?
 	if (CheckForRep(position, distanceFromRoot)) return 0;				//Have we had a draw by repitition?
 	if (position.GetFiftyMoveCount() > 100) return 0;					//cannot use >= as it could currently be checkmate which would count as a win
-	
 	
 	int Score = LowINF;
 	int MaxScore = HighINF;
@@ -598,7 +596,7 @@ int TBWinIn(int distanceFromRoot)
 
 SearchResult Quiescence(Position& position, unsigned int initialDepth, int alpha, int beta, int colour, unsigned int distanceFromRoot, int depthRemaining, SearchData& locals, ThreadSharedData& sharedData)
 {
-	position.ReportDepth(distanceFromRoot);
+	locals.ReportDepth(distanceFromRoot);
 
 	if (distanceFromRoot >= MAX_DEPTH) return 0;						//Have we reached max depth?
 	locals.PvTable[distanceFromRoot].clear();

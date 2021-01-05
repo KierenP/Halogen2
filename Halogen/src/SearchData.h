@@ -70,10 +70,14 @@ public:
 	void AddNode() { nodes++; }
 	void AddTbHit() { tbHits++; }
 
+	void ReportDepth(int depth) { selDepth = std::max(depth, selDepth); }
+
 private:
 	friend class ThreadSharedData;
+
 	uint64_t tbHits = 0;
 	uint64_t nodes = 0;
+	int selDepth = 0;
 
 //--------------------------------------------------------------------------------------------
 private:
@@ -96,6 +100,7 @@ public:
 
 	uint64_t getTBHits() const;
 	uint64_t getNodes() const;
+	int GetSelDepth() const;
 
 	SearchData& GetData(unsigned int threadID);
 
