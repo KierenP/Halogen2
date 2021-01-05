@@ -22,9 +22,6 @@ void CastleMoves(const Position& position, std::vector<Move>& moves);
 bool MovePutsSelfInCheck(Position& position, const Move& move);
 uint64_t PinnedMask(const Position& position);
 
-template <PieceTypes pieceType>
-uint64_t AttackBB(Square sq, uint64_t occupied);
-
 //special generators for when in check
 void KingEvasions(Position& position, std::vector<Move>& moves);						//move the king out of danger	(single or multi threat)
 void KingCapturesEvade(Position& position, std::vector<Move>& moves);			//use only for multi threat with king evasions
@@ -335,7 +332,7 @@ void PawnEnPassant(Position& position, std::vector<Move>& moves)
 	{
 		if (position.GetTurn() == WHITE)
 		{
-			uint64_t potentialAttackers = BlackPawnAttacks[position.GetEnPassant()] & position.GetPieceBB(WHITE_PAWN);			//if a black pawn could capture me from the ep square, I can capture on the ep square
+			uint64_t potentialAttackers = PawnAttacks[BLACK][position.GetEnPassant()] & position.GetPieceBB(WHITE_PAWN);			//if a black pawn could capture me from the ep square, I can capture on the ep square
 			while (potentialAttackers != 0)
 			{
 				Square start = static_cast<Square>(LSBpop(potentialAttackers));
@@ -348,7 +345,7 @@ void PawnEnPassant(Position& position, std::vector<Move>& moves)
 
 		if (position.GetTurn() == BLACK)
 		{
-			uint64_t potentialAttackers = WhitePawnAttacks[position.GetEnPassant()] & position.GetPieceBB(BLACK_PAWN);			//if a white pawn could capture me from the ep square, I can capture on the ep square
+			uint64_t potentialAttackers = PawnAttacks[WHITE][position.GetEnPassant()] & position.GetPieceBB(BLACK_PAWN);			//if a white pawn could capture me from the ep square, I can capture on the ep square
 			while (potentialAttackers != 0)
 			{
 				Square start = static_cast<Square>(LSBpop(potentialAttackers));
@@ -500,17 +497,8 @@ bool IsSquareThreatened(const Position& position, Square square, Players colour)
 	if ((KnightAttacks[square] & position.GetPieceBB(KNIGHT, !colour)) != 0)
 		return true;
 
-	if (colour == WHITE)
-	{
-		if ((WhitePawnAttacks[square] & position.GetPieceBB(BLACK_PAWN)) != 0)
-			return true;
-	}
-
-	if (colour == BLACK)
-	{
-		if ((BlackPawnAttacks[square] & position.GetPieceBB(WHITE_PAWN)) != 0)
-			return true;
-	}
+	if ((PawnAttacks[colour][square] & position.GetPieceBB(Piece(PAWN, !colour))) != 0)
+		return true;
 
 	if ((KingAttacks[square] & position.GetPieceBB(KING, !colour)) != 0)					//if I can attack the enemy king he can attack me
 		return true;
@@ -560,18 +548,8 @@ uint64_t GetThreats(const Position& position, Square square, Players colour)
 	uint64_t threats = EMPTY;
 
 	threats |= (KnightAttacks[square] & position.GetPieceBB(KNIGHT, !colour));
-
-	if (colour == WHITE)
-	{
-		threats |= (WhitePawnAttacks[square] & position.GetPieceBB(BLACK_PAWN));
-	}
-
-	if (colour == BLACK)
-	{
-		threats |= (BlackPawnAttacks[square] & position.GetPieceBB(WHITE_PAWN));
-	}
-
-	threats |= (KingAttacks[square] & position.GetPieceBB(KING, !colour));					//if I can attack the enemy king he can attack me
+	threats |= (PawnAttacks[colour][square] & position.GetPieceBB(Piece(PAWN, !colour)));
+	threats |= (KingAttacks[square] & position.GetPieceBB(KING, !colour));	
 
 	uint64_t Pieces = position.GetAllPieces();
 
@@ -606,17 +584,7 @@ Move GetSmallestAttackerMove(const Position& position, Square square, Players co
 {
 	assert(square < N_SQUARES);
 
-	uint64_t pawnmask = 0;
-	if (colour == BLACK)
-	{
-		pawnmask = (WhitePawnAttacks[square] & position.GetPieceBB(BLACK_PAWN));
-	}
-
-	if (colour == WHITE)
-	{
-		pawnmask = (BlackPawnAttacks[square] & position.GetPieceBB(WHITE_PAWN));
-	}
-
+	uint64_t pawnmask = (PawnAttacks[!colour][square] & position.GetPieceBB(Piece(PAWN, colour)));
 	if (pawnmask != 0)
 	{
 		return(Move(static_cast<Square>(LSBpop(pawnmask)), square, CAPTURE));
@@ -840,9 +808,9 @@ uint64_t AttackBB(Square sq, uint64_t occupied)
 		case KNIGHT:	return KnightAttacks[sq];
 		case KING:		return KingAttacks[sq];
 		case BISHOP:	return BishopTable[sq].attacks[AttackIndex(sq, occupied, BishopTable)];
-		case ROOK:		return   RookTable[sq].attacks[AttackIndex(sq, occupied, RookTable)];
+		case ROOK:		return RookTable[sq].attacks[AttackIndex(sq, occupied, RookTable)];
 		case QUEEN:		return AttackBB<ROOK>(sq, occupied) | AttackBB<BISHOP>(sq, occupied);
-		default:		throw std::invalid_argument("piecetype is argument is invalid"); return 0;
+		default:		throw std::invalid_argument("piecetype is argument is invalid");
 	}
 }
 

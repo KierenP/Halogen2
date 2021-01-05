@@ -66,7 +66,10 @@ uint64_t SearchThread(const Position& position, unsigned int threadCount, Search
 		unsigned int result = ProbeTBRoot(position);
 		if (result != TB_RESULT_FAILED)
 		{
-			PrintBestMove(GetTBMove(result));
+			if (result == TB_RESULT_STALEMATE || result == TB_RESULT_CHECKMATE)
+				std::cout << "bestmove 0000" << std::endl;
+			else
+				PrintBestMove(GetTBMove(result));
 			return 0;
 		}
 	}
@@ -369,6 +372,9 @@ SearchResult NegaScout(Position& position, unsigned int initialDepth, int depthR
 
 unsigned int ProbeTBRoot(const Position& position)
 {
+	if (position.GetCanCastleBlackKingside() || position.GetCanCastleBlackQueenside() || position.GetCanCastleWhiteKingside() || position.GetCanCastleWhiteQueenside())
+		return TB_RESULT_FAILED;
+
 	return tb_probe_root(position.GetWhitePieces(), position.GetBlackPieces(),
 		position.GetPieceBB(WHITE_KING) | position.GetPieceBB(BLACK_KING),
 		position.GetPieceBB(WHITE_QUEEN) | position.GetPieceBB(BLACK_QUEEN),
@@ -377,7 +383,6 @@ unsigned int ProbeTBRoot(const Position& position)
 		position.GetPieceBB(WHITE_KNIGHT) | position.GetPieceBB(BLACK_KNIGHT),
 		position.GetPieceBB(WHITE_PAWN) | position.GetPieceBB(BLACK_PAWN),
 		position.GetFiftyMoveCount(),
-		position.GetCanCastleBlackKingside() * TB_CASTLING_k + position.GetCanCastleBlackQueenside() * TB_CASTLING_q + position.GetCanCastleWhiteKingside() * TB_CASTLING_K + position.GetCanCastleWhiteQueenside() * TB_CASTLING_Q,
 		position.GetEnPassant() <= SQ_H8 ? position.GetEnPassant() : 0,
 		position.GetTurn(),
 		NULL);
@@ -385,6 +390,9 @@ unsigned int ProbeTBRoot(const Position& position)
 
 unsigned int ProbeTBSearch(const Position& position)
 {
+	if (position.GetFiftyMoveCount() || position.GetCanCastleBlackKingside() || position.GetCanCastleBlackQueenside() || position.GetCanCastleWhiteKingside() || position.GetCanCastleWhiteQueenside())
+		return TB_RESULT_FAILED;
+
 	return tb_probe_wdl(position.GetWhitePieces(), position.GetBlackPieces(),
 		position.GetPieceBB(WHITE_KING) | position.GetPieceBB(BLACK_KING),
 		position.GetPieceBB(WHITE_QUEEN) | position.GetPieceBB(BLACK_QUEEN),
@@ -392,8 +400,6 @@ unsigned int ProbeTBSearch(const Position& position)
 		position.GetPieceBB(WHITE_BISHOP) | position.GetPieceBB(BLACK_BISHOP),
 		position.GetPieceBB(WHITE_KNIGHT) | position.GetPieceBB(BLACK_KNIGHT),
 		position.GetPieceBB(WHITE_PAWN) | position.GetPieceBB(BLACK_PAWN),
-		position.GetFiftyMoveCount(),											
-		position.GetCanCastleBlackKingside() * TB_CASTLING_k + position.GetCanCastleBlackQueenside() * TB_CASTLING_q + position.GetCanCastleWhiteKingside() * TB_CASTLING_K + position.GetCanCastleWhiteQueenside() * TB_CASTLING_Q,
 		position.GetEnPassant() <= SQ_H8 ? position.GetEnPassant() : 0,
 		position.GetTurn());
 }
@@ -420,22 +426,23 @@ SearchResult UseSearchTBScore(unsigned int result, int distanceFromRoot)
 
 Move GetTBMove(unsigned int result)
 {
-	int flag = -1;
+	MoveFlag flag = QUIET;
 
-	if (TB_GET_PROMOTES(result) == TB_PROMOTES_NONE)
-		flag = QUIET;
-	else if (TB_GET_PROMOTES(result) == TB_PROMOTES_KNIGHT)
+	int promo = TB_GET_PROMOTES(result);
+	PieceTypes promoPiece =  promo ? static_cast<PieceTypes>(6 - promo) : N_PIECE_TYPES;
+
+	if (promoPiece == KNIGHT)
 		flag = KNIGHT_PROMOTION;
-	else if (TB_GET_PROMOTES(result) == TB_PROMOTES_BISHOP)
+	else if (promoPiece == BISHOP)
 		flag = BISHOP_PROMOTION;
-	else if (TB_GET_PROMOTES(result) == TB_PROMOTES_ROOK)
+	else if (promoPiece == ROOK)
 		flag = ROOK_PROMOTION;
-	else if (TB_GET_PROMOTES(result) == TB_PROMOTES_QUEEN)
+	else if (promoPiece == QUEEN)
 		flag = QUEEN_PROMOTION;
 	else
 		assert(0);
 
-	return Move(static_cast<Square>(TB_GET_FROM(result)), static_cast<Square>(TB_GET_TO(result)), static_cast<MoveFlag>(flag));
+	return Move(static_cast<Square>(TB_GET_FROM(result)), static_cast<Square>(TB_GET_TO(result)), flag);
 }
 
 void UpdateAlpha(int Score, int& a, const Move& move, unsigned int distanceFromRoot, SearchData& locals)

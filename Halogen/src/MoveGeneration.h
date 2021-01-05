@@ -15,3 +15,8 @@ Move GetSmallestAttackerMove(const Position& position, Square square, Players co
 
 bool MoveIsLegal(Position& position, const Move& move);
 
+// Returns the attack bitboard for a piece of piecetype on square sq
+template <PieceTypes pieceType>
+uint64_t AttackBB(Square sq, uint64_t occupied = 0);
+
+
