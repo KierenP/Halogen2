@@ -15,3 +15,5 @@ Move GetSmallestAttackerMove(const Position& position, Square square, Players co
 
 bool MoveIsLegal(Position& position, const Move& move);
 
+template <PieceTypes pieceType>
+uint64_t AttackBB(Square sq, uint64_t occupied = EMPTY);
