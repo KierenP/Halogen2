@@ -214,19 +214,19 @@ void Position::Print() const
 
 	char Letter[N_SQUARES];
 
-	for (int i = 0; i < N_SQUARES; i++)
+	for (Square i = SQ_A1; i <= SQ_H8; ++i)
 	{
-		Letter[i] = PieceToChar(GetSquare(static_cast<Square>(i)));
+		Letter[i] = PieceToChar(GetSquare(i));
 	}
 
-	for (int i = 0; i < N_SQUARES; i++)
+	for (Square i = SQ_A1; i <= SQ_H8; ++i)
 	{
-		unsigned int square = GetPosition(GetFile(i), 7 - GetRank(i));		//7- to flip on the y axis and do rank 8, 7 ...
+		Square square = GetPosition(GetFile(i), static_cast<Rank>(RANK_8 - GetRank(i)));		//to flip on the y axis and do rank 8, 7 ...
 
 		if (GetFile(square) == FILE_A)
 		{
 			std::cout << std::endl;									//Go to a new line
-			std::cout << 8 - GetRank(i);							//Count down from 8
+			std::cout << 8 - GetRank(i);		//Count down from 8
 		}
 
 		std::cout << " ";
@@ -319,9 +319,9 @@ uint64_t Position::GenerateZobristKey() const
 {
 	uint64_t Key = EMPTY;
 
-	for (int i = 0; i < N_PIECES; i++)
+	for (Pieces i = BLACK_PAWN; i <= WHITE_KING; ++i)
 	{
-		uint64_t bitboard = GetPieceBB(static_cast<Pieces>(i));
+		uint64_t bitboard = GetPieceBB(i);
 		while (bitboard != 0)
 		{
 			Key ^= ZobristTable.at(i * 64 + LSBpop(bitboard));
@@ -419,11 +419,11 @@ std::array<int16_t, INPUT_NEURONS> Position::GetInputLayer() const
 {
 	std::array<int16_t, INPUT_NEURONS> ret;
 
-	for (int i = 0; i < N_PIECES; i++)
+	for (Pieces i = BLACK_PAWN; i <= WHITE_KING; ++i)
 	{
-		uint64_t bb = GetPieceBB(static_cast<Pieces>(i));
+		uint64_t bb = GetPieceBB(i);
 
-		for (int sq = 0; sq < N_SQUARES; sq++)
+		for (Square sq = SQ_A1; sq <= SQ_H8; ++sq)
 		{
 			ret[modifier(i * 64 + sq)] = ((bb & SquareBB[sq]) != 0);
 		}

@@ -102,27 +102,27 @@ void BBInit()
 	AntiDiagonalBB[DIAG_A2B1] = 0x102;
 	AntiDiagonalBB[DIAG_A1A1] = 0x1;
 
-	for (int i = SQ_A1; i < N_SQUARES; i++)
+	for (Square i = SQ_A1; i <= SQ_H8; ++i)
 	{
 		uint64_t Bit = 1;
 		SquareBB[i] = Bit << i;
 	}
 
-	for (int i = 0; i < 64; i++)
+	for (Square i = SQ_A1; i <= SQ_H8; ++i)
 	{
-		for (int j = 0; j < 64; j++)
+		for (Square j = SQ_A1; j <= SQ_H8; ++j)
 		{
 			betweenArray[i][j] = inBetween(i, j);
 		}
 	}
 
-	for (int i = 0; i < 64; i++)
+	for (Square i = SQ_A1; i <= SQ_H8; ++i)
 	{
 		KingAttacks[i] = EMPTY;
 		WhitePawnAttacks[i] = EMPTY;
 		BlackPawnAttacks[i] = EMPTY;
 
-		for (int j = 0; j < 64; j++)
+		for (Square j = SQ_A1; j <= SQ_H8; ++j)
 		{
 			if (AbsFileDiff(i, j) <= 1 && AbsRankDiff(i, j) <= 1)
 			{
@@ -201,29 +201,7 @@ Rank GetRank(Square square)
 	return static_cast<Rank>(square / 8);
 }
 
-unsigned int GetFile(unsigned int square)
-{
-	assert(square < N_SQUARES);
-
-	return square % 8;
-}
-
-unsigned int GetRank(unsigned int square)
-{
-	assert(square < N_SQUARES);
-
-	return square / 8;
-}
-
-unsigned int GetPosition(unsigned int file, unsigned int rank)
-{
-	assert(file < N_FILES);
-	assert(file < N_RANKS);
-
-	return rank * 8 + file;
-}
-
-unsigned int AbsRankDiff(unsigned int sq1, unsigned int sq2)
+unsigned int AbsRankDiff(Square sq1, Square sq2)
 {
 	assert(sq1 < N_SQUARES);
 	assert(sq2 < N_SQUARES);
@@ -231,7 +209,7 @@ unsigned int AbsRankDiff(unsigned int sq1, unsigned int sq2)
 	return abs(static_cast<int>(GetRank(sq1)) - static_cast<int>(GetRank(sq2)));
 }
 
-unsigned int AbsFileDiff(unsigned int sq1, unsigned int sq2)
+unsigned int AbsFileDiff(Square sq1, Square sq2)
 {
 	assert(sq1 < N_SQUARES);
 	assert(sq2 < N_SQUARES);
@@ -239,7 +217,7 @@ unsigned int AbsFileDiff(unsigned int sq1, unsigned int sq2)
 	return abs(static_cast<int>(GetFile(sq1)) - static_cast<int>(GetFile(sq2)));
 }
 
-int RankDiff(unsigned int sq1, unsigned int sq2)
+int RankDiff(Square sq1, Square sq2)
 {
 	assert(sq1 < N_SQUARES);
 	assert(sq2 < N_SQUARES);
@@ -247,7 +225,7 @@ int RankDiff(unsigned int sq1, unsigned int sq2)
 	return static_cast<int>(GetRank(sq1)) - static_cast<int>(GetRank(sq2));
 }
 
-int FileDiff(unsigned int sq1, unsigned int sq2)
+int FileDiff(Square sq1, Square sq2)
 {
 	assert(sq1 < N_SQUARES);
 	assert(sq2 < N_SQUARES);
@@ -255,14 +233,14 @@ int FileDiff(unsigned int sq1, unsigned int sq2)
 	return static_cast<int>(GetFile(sq1)) - static_cast<int>(GetFile(sq2));
 }
 
-unsigned int GetDiagonal(unsigned int square)
+unsigned int GetDiagonal(Square square)
 {
 	assert(square < N_SQUARES);
 
 	return (RANK_8 - GetRank(square)) + GetFile(square);
 }
 
-unsigned int GetAntiDiagonal(unsigned int square)
+unsigned int GetAntiDiagonal(Square square)
 {
 	assert(square < N_SQUARES);
 
@@ -290,31 +268,31 @@ unsigned int AlgebraicToPos(std::string str)
 	return (str[0] - 97) + (str[1] - 49) * 8;		
 }
 
-unsigned int ColourOfPiece(unsigned int piece)
+Players ColourOfPiece(Pieces piece)
 {
 	assert(piece < N_PIECES);
 
-	return piece / N_PIECE_TYPES;
+	return static_cast<Players>(piece / N_PIECE_TYPES);
 }
 
-int LSBpop(uint64_t &bb)
+Square LSBpop(uint64_t &bb)
 {
 	assert(bb != 0);
 
-	int index = LSB(bb);
+	Square index = LSB(bb);
 
 	bb &= bb - 1;
 	return index;
 }
 
-int LSB(uint64_t bb)
+Square LSB(uint64_t bb)
 {
 #if defined(_MSC_VER) && defined(USE_POPCNT) && defined(_WIN64)
 	unsigned long index;
 	_BitScanForward64(&index, bb);
-	return index;
+	return static_cast<Square>(index);
 #elif defined(__GNUG__) && defined(USE_POPCNT)
-	return __builtin_ctzll(bb);
+	return static_cast<Square>(__builtin_ctzll(bb));
 #else
 	/**
 	 * bitScanForward
@@ -324,7 +302,7 @@ int LSB(uint64_t bb)
 	 * @return index (0..63) of least significant one bit
 	 */
 	const uint64_t debruijn64 = uint64_t(0x03f79d71b4cb0a89);
-	return index64[((bb ^ (bb - 1)) * debruijn64) >> 58];
+	return static_cast<Square>(index64[((bb ^ (bb - 1)) * debruijn64) >> 58]);
 #endif
 }
 
@@ -370,7 +348,7 @@ Magic RookTable[64];
 // the step, or an empty bitboard if the step would go outside the board
 uint64_t LandingSquareBB(const int sq, const int step) {
 	const unsigned int to = sq + step;
-	return (uint64_t)(to <= SQ_H8 && std::max(AbsFileDiff(sq, to), AbsRankDiff(sq, to)) <= 2) << (to & SQ_H8);
+	return (uint64_t)(to <= SQ_H8 && std::max(AbsFileDiff(static_cast<Square>(sq), static_cast<Square>(to)), AbsRankDiff(static_cast<Square>(sq), static_cast<Square>(to))) <= 2) << (to & SQ_H8);
 }
 
 // Helper function that makes a slider attack bitboard
@@ -400,8 +378,8 @@ void InitSliderAttacks(Magic m[64], uint64_t *table, const int steps[4]) {
 		m[sq].attacks = table;
 
 		// Construct the mask
-		uint64_t edges = ((RankBB[RANK_1] | RankBB[RANK_8]) & ~RankBB[GetRank(sq)])
-			| ((FileBB[FILE_A] | FileBB[FILE_H]) & ~FileBB[GetFile(sq)]);
+		uint64_t edges = ((RankBB[RANK_1] | RankBB[RANK_8]) & ~RankBB[GetRank(static_cast<Square>(sq))])
+			| ((FileBB[FILE_A] | FileBB[FILE_H]) & ~FileBB[GetFile(static_cast<Square>(sq))]);
 
 		m[sq].mask = MakeSliderAttackBB(sq, 0, steps) & ~edges;
 

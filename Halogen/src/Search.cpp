@@ -99,9 +99,9 @@ void InitSearch()
 		FutilityMargins[i] = Futility_linear * i + Futility_constant;
 	}
 
-	for (int i = 0; i < 64; i++)
+	for (Square i = SQ_A1; i <= SQ_H8; ++i)
 	{
-		for (int j = 0; j < 64; j++)
+		for (Square j = SQ_A1; j <= SQ_H8; ++j)
 		{
 			LMR_reduction[i][j] = std::round(LMR_constant + LMR_coeff * log(i + 1) * log(j + 1));
 		}

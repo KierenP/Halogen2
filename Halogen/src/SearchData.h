@@ -33,7 +33,7 @@ public:
 	void SetDepthLimit(int depth);
 	void SetMateLimit(int moves);
 
-	int ElapsedTime() {	return SearchTimeManager.ElapsedMs(); }
+	int ElapsedTime() const { return SearchTimeManager.ElapsedMs(); }
 
 private:
 

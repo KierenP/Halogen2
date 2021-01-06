@@ -14,6 +14,9 @@
 
 extern bool HASH_ENABLE;
 
+#define ENUM_PREINCREMENT(e) inline e& operator++(e& val) { return val = static_cast<e>(static_cast<int>(val) + 1); }
+//#define ENUM_MINUS(e) inline e operator-(const e& lhs, const e& rhs) { return static_cast<e>(lhs - rhs); }
+
 enum Square
 {
 	SQ_A1, SQ_B1, SQ_C1, SQ_D1, SQ_E1, SQ_F1, SQ_G1, SQ_H1,
@@ -27,6 +30,8 @@ enum Square
 
 	N_SQUARES,
 };
+
+ENUM_PREINCREMENT(Square);
 
 enum Players
 {
@@ -56,6 +61,8 @@ enum Pieces
 
 	N_PIECES
 };
+
+ENUM_PREINCREMENT(Pieces);
 
 enum PieceTypes
 {
@@ -148,26 +155,20 @@ enum GameStages
 
 void BBInit();
 char PieceToChar(unsigned int piece);
-unsigned int Piece(unsigned int piecetype, unsigned int colour);
 
-unsigned int GetFile(unsigned int square);
-unsigned int GetRank(unsigned int square);
-unsigned int GetPosition(unsigned int file, unsigned int rank);
-unsigned int AbsRankDiff(unsigned int sq1, unsigned int sq2);
-unsigned int AbsFileDiff(unsigned int sq1, unsigned int sq2);
-int RankDiff(unsigned int sq1, unsigned int sq2);
-int FileDiff(unsigned int sq1, unsigned int sq2);
-unsigned int GetDiagonal(unsigned int square);
-unsigned int GetAntiDiagonal(unsigned int square);
-unsigned int GetBitCount(uint64_t bb);
-unsigned int AlgebraicToPos(std::string str);
-unsigned int ColourOfPiece(unsigned int piece);
-
-//TODO slowly change over the functions to use expicit enums
 Pieces Piece(PieceTypes type, Players colour);
 Square GetPosition(File file, Rank rank);
 File GetFile(Square square);
 Rank GetRank(Square square);
+unsigned int AbsRankDiff(Square sq1, Square sq2);
+unsigned int AbsFileDiff(Square sq1, Square sq2);
+int RankDiff(Square sq1, Square sq2);
+int FileDiff(Square sq1, Square sq2);
+unsigned int GetDiagonal(Square square);
+unsigned int GetAntiDiagonal(Square square);
+unsigned int GetBitCount(uint64_t bb);
+unsigned int AlgebraicToPos(std::string str);
+Players ColourOfPiece(Pieces piece);
 
 extern uint64_t EMPTY;
 extern uint64_t UNIVERCE;
@@ -189,8 +190,8 @@ extern uint64_t KingAttacks[N_SQUARES];
 extern uint64_t WhitePawnAttacks[N_SQUARES];
 extern uint64_t BlackPawnAttacks[N_SQUARES];
 
-int LSBpop(uint64_t &bb);
-int LSB(uint64_t bb);
+Square LSBpop(uint64_t &bb);
+Square LSB(uint64_t bb);
 
 uint64_t inBetween(unsigned int sq1, unsigned int sq2);	//return the bb of the squares in between (exclusive) the two squares
 uint64_t inBetweenCache(unsigned int from, unsigned int to);

@@ -30,7 +30,7 @@ class MoveGenerator
 public:
 	MoveGenerator(Position& Position, int DistanceFromRoot, const SearchData& Locals, bool Quiessence);
 	bool Next(Move& move);	//returns false if no more legal moves
-	int GetSEE() { return (current - 1)->SEE; }
+	int GetSEE() const { return (current - 1)->SEE; }
 
 private:
 	void OrderMoves(std::vector<ExtendedMove>& moves);

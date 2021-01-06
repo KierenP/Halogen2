@@ -105,7 +105,7 @@ uint64_t PinnedMask(const Position& position)
 
 	while (possiblePins != 0)
 	{
-		unsigned int sq = LSBpop(possiblePins);
+		Square sq = LSBpop(possiblePins);
 
 		if (!mayMove(king, sq, maskAll))	//if you can't move from the square to the king, it can't be pinned
 			continue;
@@ -669,7 +669,7 @@ bool MoveIsLegal(Position& position, const Move& move)
 	if (move.IsUninitialized())
 		return false;
 
-	unsigned int piece = position.GetSquare(move.GetFrom());
+	Pieces piece = position.GetSquare(move.GetFrom());
 
 	/*Make sure there's a piece to be moved*/
 	if (position.GetSquare(move.GetFrom()) == N_PIECES)
@@ -840,9 +840,9 @@ uint64_t AttackBB(Square sq, uint64_t occupied)
 		case KNIGHT:	return KnightAttacks[sq];
 		case KING:		return KingAttacks[sq];
 		case BISHOP:	return BishopTable[sq].attacks[AttackIndex(sq, occupied, BishopTable)];
-		case ROOK:		return   RookTable[sq].attacks[AttackIndex(sq, occupied, RookTable)];
+		case ROOK:		return RookTable[sq].attacks[AttackIndex(sq, occupied, RookTable)];
 		case QUEEN:		return AttackBB<ROOK>(sq, occupied) | AttackBB<BISHOP>(sq, occupied);
-		default:		throw std::invalid_argument("piecetype is argument is invalid"); return 0;
+		default:		throw std::invalid_argument("piecetype is argument is invalid");
 	}
 }
 

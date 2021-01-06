@@ -107,7 +107,7 @@ void BitBoard::ClearSquare(Square square)
 {
 	assert(square < N_SQUARES);
 
-	for (int i = 0; i < N_PIECES; i++)
+	for (Pieces i = BLACK_PAWN; i <= WHITE_KING; ++i)
 	{
 		Current->m_Bitboard[i] &= ~SquareBB[square];
 	}
@@ -144,10 +144,10 @@ bool BitBoard::IsOccupied(Square square, Players colour) const
 
 Pieces BitBoard::GetSquare(Square square) const
 {
-	for (int i = 0; i < N_PIECES; i++)
+	for (Pieces i = BLACK_PAWN; i <= WHITE_KING; ++i)
 	{
-		if ((GetPieceBB(static_cast<Pieces>(i)) & SquareBB[square]) != 0)
-			return static_cast<Pieces>(i);
+		if ((GetPieceBB(i) & SquareBB[square]) != 0)
+			return i;
 	}
 
 	return N_PIECES;
