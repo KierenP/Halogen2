@@ -111,7 +111,7 @@
  * Define TB_KING_ATTACKS(square) to return the king attacks bitboard for a
  * king at `square'.
  */
-#define TB_KING_ATTACKS(square)				AttackBB<KING>(static_cast<Square>(square))
+#define TB_KING_ATTACKS(square)				AttackBB(static_cast<Square>(square), KING)
 
 /*
  * Define TB_KNIGHT_ATTACKS(square) to return the knight attacks bitboard for
