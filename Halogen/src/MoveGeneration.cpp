@@ -814,4 +814,18 @@ uint64_t AttackBB(Square sq, uint64_t occupied)
 	}
 }
 
+uint64_t AttackBB(Square sq, PieceTypes pieceType, uint64_t occupied)
+{
+	switch (pieceType)
+	{
+		case KNIGHT:	return AttackBB<KNIGHT>(sq, occupied);
+		case KING:		return AttackBB<KING>(sq, occupied);
+		case BISHOP:	return AttackBB<BISHOP>(sq, occupied);
+		case ROOK:		return AttackBB<ROOK>(sq, occupied);
+		case QUEEN:		return AttackBB<QUEEN>(sq, occupied);
+		default:		throw  std::invalid_argument("piecetype is argument is invalid");
+	}
+}
+
 //--------------------------------------------------------------------------
+

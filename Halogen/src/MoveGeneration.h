@@ -17,3 +17,5 @@ bool MoveIsLegal(Position& position, const Move& move);
 
 template <PieceTypes pieceType>
 uint64_t AttackBB(Square sq, uint64_t occupied = EMPTY);
+
+uint64_t AttackBB(Square sq, PieceTypes pieceType, uint64_t occupied = EMPTY);

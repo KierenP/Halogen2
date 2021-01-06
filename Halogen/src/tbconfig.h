@@ -117,19 +117,19 @@
  * Define TB_KNIGHT_ATTACKS(square) to return the knight attacks bitboard for
  * a knight at `square'.
  */
-#define TB_KNIGHT_ATTACKS(square)			AttackBB<KNIGHT>(static_cast<Square>(square))
+#define TB_KNIGHT_ATTACKS(square)			AttackBB(static_cast<Square>(square), KNIGHT)
 
 /*
  * Define TB_ROOK_ATTACKS(square, occ) to return the rook attacks bitboard
  * for a rook at `square' assuming the given `occ' occupancy bitboard.
  */
-#define TB_ROOK_ATTACKS(square, occ)		AttackBB<ROOK>(static_cast<Square>(square), occ)
+#define TB_ROOK_ATTACKS(square, occ)		AttackBB(static_cast<Square>(square), ROOK, occ)
 
 /*
  * Define TB_BISHOP_ATTACKS(square, occ) to return the bishop attacks bitboard
  * for a bishop at `square' assuming the given `occ' occupancy bitboard.
  */
-#define TB_BISHOP_ATTACKS(square, occ)		AttackBB<BISHOP>(static_cast<Square>(square), occ)
+#define TB_BISHOP_ATTACKS(square, occ)		AttackBB(static_cast<Square>(square), BISHOP, occ)
 
 /*
  * Define TB_QUEEN_ATTACKS(square, occ) to return the queen attacks bitboard
@@ -137,7 +137,7 @@
  * NOTE: If no definition is provided then tbprobe will use:
  *       TB_ROOK_ATTACKS(square, occ) | TB_BISHOP_ATTACKS(square, occ)
  */
-#define TB_QUEEN_ATTACKS(square, occ)		AttackBB<QUEEN>(static_cast<Square>(square), occ)
+#define TB_QUEEN_ATTACKS(square, occ)		AttackBB(static_cast<Square>(square), QUEEN, occ)
 
 /*
  * Define TB_PAWN_ATTACKS(square, color) to return the pawn attacks bitboard
