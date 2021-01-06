@@ -11,7 +11,7 @@ SearchData::SearchData(const SearchLimits& Limits) : HistoryMatrix {}, limits(Li
 	for (int i = 0; i < N_PLAYERS; i++)
 		for (int j = 0; j < N_SQUARES; j++)
 			for (int k = 0; k < N_SQUARES; k++)
-				HistoryMatrix[i][j][k] = GlobalHistory[i][j][k];
+				HistoryMatrix[i][j][k] = GlobalHistory[i][j][k]; 
 }
 
 ThreadSharedData::ThreadSharedData(const SearchLimits& limits, unsigned int threads, bool NoOutput) : currentBestMove()
