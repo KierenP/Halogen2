@@ -86,6 +86,27 @@ uint64_t SearchThread(const Position& position, unsigned int threadCount, Search
 		threads[i].join();
 	}
 
+	//Increase GlobalHistory by the average values in each threads
+	for (int i = 0; i < N_PLAYERS; i++)
+	{
+		for (int j = 0; j < N_SQUARES; j++)
+		{
+			for (int k = 0; k < N_SQUARES; k++)
+			{
+				uint64_t sum = 0;
+				for (int thread = 0; thread < threadCount; thread++)
+					sum += sharedData.GetData(thread).HistoryMatrix[i][j][k];
+				GlobalHistory[i][j][k] += sum / threadCount;
+			}
+		}
+	}
+
+	//Decay the values by halving them
+	for (int i = 0; i < N_PLAYERS; i++)
+		for (int j = 0; j < N_SQUARES; j++)
+			for (int k = 0; k < N_SQUARES; k++)
+				GlobalHistory[i][j][k] /= 2;
+
 	PrintBestMove(sharedData.GetBestMove());
 	return sharedData.getNodes();				//Used by bench searches. Otherwise is discarded.
 }

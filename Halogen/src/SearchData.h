@@ -5,6 +5,7 @@
 #include "TranspositionTable.h"
 
 extern TranspositionTable tTable;
+extern unsigned int GlobalHistory[N_PLAYERS][N_SQUARES][N_SQUARES];
 
 enum Score
 {

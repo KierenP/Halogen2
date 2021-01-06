@@ -1,11 +1,17 @@
 #include "SearchData.h"
 
 TranspositionTable tTable;
+unsigned int GlobalHistory[N_PLAYERS][N_SQUARES][N_SQUARES] = {};
 
 SearchData::SearchData(const SearchLimits& Limits) : HistoryMatrix {}, limits(Limits)
 {
 	PvTable.resize(MAX_DEPTH);
 	KillerMoves.resize(MAX_DEPTH);
+
+	for (int i = 0; i < N_PLAYERS; i++)
+		for (int j = 0; j < N_SQUARES; j++)
+			for (int k = 0; k < N_SQUARES; k++)
+				HistoryMatrix[i][j][k] = GlobalHistory[i][j][k];
 }
 
 ThreadSharedData::ThreadSharedData(const SearchLimits& limits, unsigned int threads, bool NoOutput) : currentBestMove()

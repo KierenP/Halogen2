@@ -66,6 +66,11 @@ int main(int argc, char* argv[])
 		{
 			position.StartingPosition();
 			tTable.ResetTable();
+
+			for (int i = 0; i < N_PLAYERS; i++)
+				for (int j = 0; j < N_SQUARES; j++)
+					for (int k = 0; k < N_SQUARES; k++)
+						GlobalHistory[i][j][k] = 0;
 		}
 
 		else if (token == "position")
@@ -175,6 +180,11 @@ int main(int argc, char* argv[])
 				if (token == "Hash") 
 				{
 					tTable.ResetTable();
+
+					for (int i = 0; i < N_PLAYERS; i++)
+						for (int j = 0; j < N_SQUARES; j++)
+							for (int k = 0; k < N_SQUARES; k++)
+								GlobalHistory[i][j][k] = 0;
 				}
 			}
 
@@ -501,6 +511,12 @@ void Bench(int depth)
 		SearchLimits limits;
 		limits.SetDepthLimit(depth);
 		tTable.ResetTable();
+
+		for (int i = 0; i < N_PLAYERS; i++)
+			for (int j = 0; j < N_SQUARES; j++)
+				for (int k = 0; k < N_SQUARES; k++)
+					GlobalHistory[i][j][k] = 0;
+
 		nodeCount += SearchThread(position, 1, limits, false);
 	}
 

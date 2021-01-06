@@ -216,7 +216,7 @@ void MoveGenerator::OrderMoves(std::vector<ExtendedMove>& moves)
 		//Quiet
 		else
 		{
-			moves[i].score = std::min(1000000U, locals.HistoryMatrix[position.GetTurn()][moves[i].move.GetFrom()][moves[i].move.GetTo()]);
+			moves[i].score = std::min(2000000U, locals.HistoryMatrix[position.GetTurn()][moves[i].move.GetFrom()][moves[i].move.GetTo()]);
 		}
 	}
 
