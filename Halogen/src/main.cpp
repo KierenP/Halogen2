@@ -36,6 +36,9 @@ int main(int argc, char* argv[])
 
 	unsigned int ThreadCount = 1;
 
+	int x[4];
+	std::cout << x[4] << std::endl;
+
 	for (int i = 1; i < argc; i++)	//read any command line input as a regular UCI instruction
 	{
 		Line += argv[i];
