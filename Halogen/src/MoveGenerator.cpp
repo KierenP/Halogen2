@@ -129,6 +129,7 @@ bool MoveGenerator::Next(Move& move)
 
 void MoveGenerator::AdjustHistory(const Move& move, SearchData& Locals, int depthRemaining) const
 {
+	depthRemaining = std::max(depthRemaining, 10);
 	Locals.History.AddHistory(position.GetTurn(), move.GetFrom(), move.GetTo(), depthRemaining * depthRemaining);
 
 	for (auto it = legalMoves.begin(); it != current - 1 && it != legalMoves.end(); ++it)
