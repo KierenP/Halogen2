@@ -1,5 +1,5 @@
 #include "Network.h"
-#include "7a4edf1c5c72c9e3415ac01d2bf534170cdaa1d82e99876a0bf35ef5800b7fac.nn"
+#include "b9e24f227925572461787cdafb807046a6e0f29a2283017c227508d2280c0fea.nn"
 
 std::array<std::array<int16_t, HIDDEN_NEURONS>, INPUT_NEURONS> Network::hiddenWeights = {};
 std::array<int16_t, HIDDEN_NEURONS> Network::hiddenBias = {};
@@ -11,16 +11,16 @@ void Network::Init()
     size_t index = 0;
 
     for (size_t i = 0; i < HIDDEN_NEURONS; i++)
-        hiddenBias[i] = (int16_t)round(label[index++] * PRECISION);
+        hiddenBias[i] = label[index++];
 
     for (size_t i = 0; i < INPUT_NEURONS; i++)
         for (size_t j = 0; j < HIDDEN_NEURONS; j++)
-            hiddenWeights[i][j] = (int16_t)round(label[index++] * PRECISION);
+            hiddenWeights[i][j] = label[index++];
 
-    outputBias = (int16_t)round(label[index++] * PRECISION);
+    outputBias = label[index++];
 
     for (size_t i = 0; i < HIDDEN_NEURONS; i++)
-        outputWeights[i] = (int16_t)round(label[index++] * PRECISION);
+        outputWeights[i] = label[index++];
 }
 
 void Network::RecalculateIncremental(std::array<int16_t, INPUT_NEURONS> inputs)
