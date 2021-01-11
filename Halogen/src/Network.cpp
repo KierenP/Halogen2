@@ -1,5 +1,5 @@
 #include "Network.h"
-#include "halogen-x256-eb873cf4.nn"
+#include "7a4edf1c5c72c9e3415ac01d2bf534170cdaa1d82e99876a0bf35ef5800b7fac.nn"
 
 std::array<std::array<int16_t, HIDDEN_NEURONS>, INPUT_NEURONS> Network::hiddenWeights = {};
 std::array<int16_t, HIDDEN_NEURONS> Network::hiddenBias = {};
@@ -8,32 +8,19 @@ int16_t Network::outputBias = {};
 
 void Network::Init()
 {
-    auto* HiddenWeights = new float[INPUT_NEURONS * HIDDEN_NEURONS];
-    auto* HiddenBias    = new float[HIDDEN_NEURONS];
-    auto* OutputWeights = new float[HIDDEN_NEURONS];
-    auto* OutputBias    = new float[1];
+    size_t index = 0;
 
-    memcpy(HiddenBias,    &label[0],                                                                     sizeof(float) * HIDDEN_NEURONS);
-    memcpy(HiddenWeights, &label[(HIDDEN_NEURONS) * sizeof(float)],                                      sizeof(float) * INPUT_NEURONS * HIDDEN_NEURONS);
-    memcpy(OutputBias,    &label[(HIDDEN_NEURONS + INPUT_NEURONS * HIDDEN_NEURONS) * sizeof(float)],     sizeof(float) * 1);
-    memcpy(OutputWeights, &label[(HIDDEN_NEURONS + INPUT_NEURONS * HIDDEN_NEURONS + 1) * sizeof(float)], sizeof(float) * HIDDEN_NEURONS);
+    for (size_t i = 0; i < HIDDEN_NEURONS; i++)
+        hiddenBias[i] = (int16_t)round(label[index++] * PRECISION);
 
     for (size_t i = 0; i < INPUT_NEURONS; i++)
         for (size_t j = 0; j < HIDDEN_NEURONS; j++)
-            hiddenWeights[i][j] = (int16_t)round(HiddenWeights[i * HIDDEN_NEURONS + j] * PRECISION);
+            hiddenWeights[i][j] = (int16_t)round(label[index++] * PRECISION);
+
+    outputBias = (int16_t)round(label[index++] * PRECISION);
 
     for (size_t i = 0; i < HIDDEN_NEURONS; i++)
-        hiddenBias[i] = (int16_t)round(HiddenBias[i] * PRECISION);
-
-    for (size_t i = 0; i < HIDDEN_NEURONS; i++)
-        outputWeights[i] = (int16_t)round(OutputWeights[i] * PRECISION);
-
-    outputBias = (int16_t)round(OutputBias[0] * PRECISION);
-
-    delete[] HiddenWeights;
-    delete[] HiddenBias;
-    delete[] OutputWeights;
-    delete[] OutputBias;
+        outputWeights[i] = (int16_t)round(label[index++] * PRECISION);
 }
 
 void Network::RecalculateIncremental(std::array<int16_t, INPUT_NEURONS> inputs)
