@@ -9,7 +9,7 @@ int Null_constant = 4;
 int Null_depth_quotent = 6;
 int Null_beta_quotent = 250;
 
-int Futility_linear = 25;
+int Futility_linear = 50;
 int Futility_constant = 100;
 
 int Aspiration_window = 15;
