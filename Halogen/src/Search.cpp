@@ -354,7 +354,8 @@ SearchResult NegaScout(Position& position, unsigned int initialDepth, int depthR
 			break;
 		}
 
-		b = a + 1;				//Set a new zero width window
+		if (distanceFromRoot > 0)
+			b = a + 1;				//Set a new zero width window
 	}
 
 	//Checkmate or stalemate 
