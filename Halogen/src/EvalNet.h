@@ -6,12 +6,11 @@
 #include <algorithm>
 
 //needed for SEE
-extern int pieceValueVector[N_STAGES][N_PIECE_TYPES];
+constexpr int pieceValueVector[N_PIECE_TYPES] = { 91, 532, 568, 715, 1279, 5000 };
 
 bool DeadPosition(const Position& position);
-bool IsBlockade(const Position& position);
 
 int EvaluatePositionNet(const Position& position, EvalCacheTable& evalTable);
 
-int PieceValues(unsigned int Piece, GameStages GameStage = MIDGAME);
+int PieceValues(unsigned int Piece);
 

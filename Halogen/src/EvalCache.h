@@ -5,6 +5,8 @@
 #include <assert.h>
 #include <iostream>
 
+constexpr size_t TableSize = 65536;
+
 struct EvalCacheEntry
 {
 	uint64_t key = 0;
@@ -14,17 +16,11 @@ struct EvalCacheEntry
 class EvalCacheTable
 {
 public:
-	EvalCacheTable();
-	~EvalCacheTable();
-
 	void AddEntry(uint64_t key, int eval);
 	bool GetEntry(uint64_t key, int& eval);
 
 	void Reset();
 
-	uint64_t hits = 0;
-	uint64_t misses = 0;
-
 private:
-	std::vector<EvalCacheEntry> table;
+	std::vector<EvalCacheEntry> table = std::vector<EvalCacheEntry>(TableSize);
 };

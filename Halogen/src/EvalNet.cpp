@@ -1,8 +1,5 @@
 #include "EvalNet.h"
 
-int pieceValueVector[N_STAGES][N_PIECE_TYPES] = { {91, 532, 568, 715, 1279, 5000},
-                                                  {111, 339, 372, 638, 1301, 5000} };
-
 constexpr int TEMPO = 10;
 
 void NetworkScaleAdjustment(int& eval);
@@ -45,9 +42,9 @@ void NetworkScaleAdjustment(int& eval)
     eval = eval * 94 / 100;
 }
 
-int PieceValues(unsigned int Piece, GameStages GameStage)
+int PieceValues(unsigned int Piece)
 {
-    return pieceValueVector[GameStage][GetPieceType(static_cast<Pieces>(Piece))];
+    return pieceValueVector[GetPieceType(static_cast<Pieces>(Piece))];
 }
 
 bool DeadPosition(const Position& position)
