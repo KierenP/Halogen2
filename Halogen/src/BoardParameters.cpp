@@ -1,26 +1,17 @@
 #include "BoardParameters.h"
 
-BoardParameters::BoardParameters()
-{
-	InitParameters();
-}
-
-BoardParameters::~BoardParameters()
-{
-}
+BoardParameters::~BoardParameters() = default;
 
 void BoardParameters::WhiteCastled()
 {
 	SetCanCastleWhiteKingside(false);
 	SetCanCastleWhiteQueenside(false);
-	SetHasCastledWhite(true);
 }
 
 void BoardParameters::BlackCastled()
 {
 	SetCanCastleBlackKingside(false);
 	SetCanCastleBlackQueenside(false);
-	SetHasCastledBlack(true);
 }
 
 void BoardParameters::NextTurn()
@@ -29,7 +20,7 @@ void BoardParameters::NextTurn()
 	SetTurn(!GetTurn());
 }
 
-void BoardParameters::InitParameters()
+void BoardParameters::ResetParameters()
 {
 	PreviousParameters = { BoardParameterData() };
 	Current = PreviousParameters.begin();
@@ -37,7 +28,7 @@ void BoardParameters::InitParameters()
 
 bool BoardParameters::InitialiseParametersFromFen(std::vector<std::string> fen)
 {
-	InitParameters();
+	ResetParameters();
 
 	if (fen[1] == "w")
 		SetTurn(WHITE);
@@ -112,23 +103,4 @@ void BoardParameters::UpdateCastleRights(Move move)
 	{
 		SetCanCastleBlackKingside(false);
 	}
-}
-
-BoardParameterData::BoardParameterData()
-{
-	m_CurrentTurn = WHITE;
-	m_WhiteKingCastle = false;
-	m_WhiteQueenCastle = false;
-	m_BlackKingCastle = false;
-	m_BlackQueenCastle = false;
-
-	m_EnPassant = N_SQUARES;
-	m_FiftyMoveCount = 0;
-	m_TurnCount = 1;
-
-	m_HasCastledWhite = false;
-	m_HasCastledBlack = false;
-
-	m_CaptureSquare = N_SQUARES;		
-	m_CapturePiece = N_PIECES;
 }

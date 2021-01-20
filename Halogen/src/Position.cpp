@@ -311,7 +311,7 @@ void Position::Reset()
 	key = EMPTY;
 
 	ResetBoard();
-	InitParameters();
+	ResetParameters();
 }
 
 uint64_t Position::GenerateZobristKey() const

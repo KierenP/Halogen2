@@ -5,34 +5,29 @@
 
 struct BoardParameterData
 {
-	BoardParameterData();
+	BoardParameterData() = default;
 
-	Square m_CaptureSquare;
-	Pieces m_CapturePiece;
-	Square m_EnPassant;
-	unsigned int m_FiftyMoveCount;
-	unsigned int m_TurnCount;
+	Square m_CaptureSquare = N_SQUARES;
+	Pieces m_CapturePiece = N_PIECES;
+	Square m_EnPassant = N_SQUARES;
+	unsigned int m_FiftyMoveCount = 0;
+	unsigned int m_TurnCount = 1;
 
-	bool m_HasCastledWhite;
-	bool m_HasCastledBlack;
-
-	Players m_CurrentTurn;
-	bool m_WhiteKingCastle;
-	bool m_WhiteQueenCastle;
-	bool m_BlackKingCastle;
-	bool m_BlackQueenCastle;
+	Players m_CurrentTurn = N_PLAYERS;
+	bool m_WhiteKingCastle = false;
+	bool m_WhiteQueenCastle = false;
+	bool m_BlackKingCastle = false;
+	bool m_BlackQueenCastle = false;
 };
 
 class BoardParameters
 {
 public:
-	BoardParameters();
+	BoardParameters() = default;
 	virtual ~BoardParameters() = 0;
 
 	unsigned int GetTurnCount() const { return Current->m_TurnCount; }
 	Players GetTurn() const { return Current->m_CurrentTurn; }
-	bool GetHasCastledWhite() const { return Current->m_HasCastledWhite; }
-	bool GetHasCastledBlack() const { return Current->m_HasCastledBlack; }
 	bool GetCanCastleWhiteKingside() const { return Current->m_WhiteKingCastle; }
 	bool GetCanCastleWhiteQueenside() const { return Current->m_WhiteQueenCastle; }
 	bool GetCanCastleBlackKingside() const { return Current->m_BlackKingCastle; }
@@ -44,8 +39,6 @@ public:
 
 	void SetTurnCount(unsigned int val) { Current->m_TurnCount = val; }
 	void SetTurn(Players val) { Current->m_CurrentTurn = val; }
-	void SetHasCastledWhite(bool val) { Current->m_HasCastledWhite = val; }
-	void SetHasCastledBlack(bool val) { Current->m_HasCastledBlack = val; }
 	void SetCanCastleWhiteKingside(bool val) { Current->m_WhiteKingCastle = val; }
 	void SetCanCastleWhiteQueenside(bool val) { Current->m_WhiteQueenCastle = val; }
 	void SetCanCastleBlackKingside(bool val) { Current->m_BlackKingCastle = val; }
@@ -56,7 +49,6 @@ public:
 	void SetFiftyMoveCount(unsigned int val) { Current->m_FiftyMoveCount = val; }
 
 protected:
-
 	//Functions for the Zobrist key incremental updates
 	Square PrevGetEnPassant() const { return (Current - 1)->m_EnPassant; }
 	bool PrevGetCanCastleWhiteKingside() const { return (Current - 1)->m_WhiteKingCastle; }
@@ -77,10 +69,9 @@ protected:
 	//The only function like this, because we need to be able to do this when detecting 50 move repititions
 	unsigned int GetPreviousFiftyMove(unsigned int index) const { return PreviousParameters.at(index).m_FiftyMoveCount; }
 
-	void InitParameters();
+	void ResetParameters();
 
 private:
-
 	std::vector<BoardParameterData> PreviousParameters = { BoardParameterData() };
 	std::vector<BoardParameterData>::iterator Current = PreviousParameters.begin();
 };
