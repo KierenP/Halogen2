@@ -1,13 +1,6 @@
 #include "BitBoard.h"
-#include <stdexcept>
 
-BitBoard::BitBoard()
-{
-}
-
-BitBoard::~BitBoard()
-{
-}
+BitBoard::~BitBoard() = default;
 
 void BitBoard::ResetBoard()
 {
@@ -26,7 +19,7 @@ bool BitBoard::InitialiseBoardFromFen(std::vector<std::string> fen)
 		char letter = fen[0].at(FenLetter);
 		//ugly code, but surely this is the only time in the code that we iterate over squares in a different order than the Square enum
 		//the squares values go up as you move up the board towards black's starting side, but a fen starts from the black side and works downwards
-		Square sq = static_cast<Square>((RANK_8 - square / 8) * 8 + square % 8);
+		auto sq = static_cast<Square>((RANK_8 - square / 8) * 8 + square % 8);
 
 		switch (letter)
 		{
@@ -74,11 +67,6 @@ void BitBoard::RestorePreviousBoard()
 	previousBoards.pop_back();
 }
 
-BitBoardData::BitBoardData() : m_Bitboard {0}
-{
-
-}
-
 uint64_t BitBoard::GetPiecesColour(Players colour) const
 {
 	if (colour == WHITE)
@@ -107,10 +95,9 @@ void BitBoard::ClearSquare(Square square)
 {
 	assert(square < N_SQUARES);
 
-	for (int i = 0; i < N_PIECES; i++)
-	{
-		Current->m_Bitboard[i] &= ~SquareBB[square];
-	}
+	std::for_each(Current->m_Bitboard.begin(),
+		Current->m_Bitboard.end(),
+		[square](uint64_t& layer) { layer &= ~SquareBB[square]; });
 }
 
 uint64_t BitBoard::GetPieceBB(PieceTypes pieceType, Players colour) const

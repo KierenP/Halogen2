@@ -4,14 +4,14 @@
 
 struct BitBoardData
 {
-	BitBoardData();
-	uint64_t m_Bitboard[N_PIECES];
+	BitBoardData() = default;
+	std::array<uint64_t, N_PIECES> m_Bitboard = {};
 };
 
 class BitBoard
 {
 public:
-	BitBoard();
+	BitBoard() = default;
 	virtual ~BitBoard() = 0;
 
 	Pieces GetSquare(Square square) const;
