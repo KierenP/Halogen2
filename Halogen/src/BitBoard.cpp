@@ -95,9 +95,10 @@ void BitBoard::ClearSquare(Square square)
 {
 	assert(square < N_SQUARES);
 
-	std::for_each(Current->m_Bitboard.begin(),
-		Current->m_Bitboard.end(),
-		[square](uint64_t& layer) { layer &= ~SquareBB[square]; });
+	for (int i = 0; i < N_PIECES; i++)
+	{
+		Current->m_Bitboard[i] &= ~SquareBB[square];
+	}
 }
 
 uint64_t BitBoard::GetPieceBB(PieceTypes pieceType, Players colour) const
