@@ -45,7 +45,7 @@ public:
     static void Init();
 
 private:
-    std::vector<std::array<int32_t, HIDDEN_NEURONS>> Zeta;
+    std::vector<std::array<int16_t, HIDDEN_NEURONS>> Zeta;
 
     static std::array<std::array<int16_t, HIDDEN_NEURONS>, INPUT_NEURONS> hiddenWeights;
     static std::array<int16_t, HIDDEN_NEURONS> hiddenBias;
