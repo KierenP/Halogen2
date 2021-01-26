@@ -1,5 +1,5 @@
 #include "Network.h"
-#include "halogen-x256-eb873cf4.nn"
+#include "out.net"
 
 std::array<std::array<int16_t, HIDDEN_NEURONS>, INPUT_NEURONS> Network::hiddenWeights = {};
 std::array<int16_t, HIDDEN_NEURONS> Network::hiddenBias = {};
@@ -17,6 +17,28 @@ void Network::Init()
     memcpy(HiddenWeights, &label[(HIDDEN_NEURONS) * sizeof(float)],                                      sizeof(float) * INPUT_NEURONS * HIDDEN_NEURONS);
     memcpy(OutputBias,    &label[(HIDDEN_NEURONS + INPUT_NEURONS * HIDDEN_NEURONS) * sizeof(float)],     sizeof(float) * 1);
     memcpy(OutputWeights, &label[(HIDDEN_NEURONS + INPUT_NEURONS * HIDDEN_NEURONS + 1) * sizeof(float)], sizeof(float) * HIDDEN_NEURONS);
+
+    float largest = 0;
+
+    for (int i = 0; i < INPUT_NEURONS * HIDDEN_NEURONS; i++)
+    {
+        largest = std::max(largest, abs(HiddenWeights[i]));
+    }
+
+    for (int i = 0; i < HIDDEN_NEURONS; i++)
+    {
+        largest = std::max(largest, abs(HiddenBias[i]));
+    }
+
+    for (int i = 0; i < HIDDEN_NEURONS; i++)
+    {
+        largest = std::max(largest, abs(OutputWeights[i]));
+    }
+
+    for (int i = 0; i < 1; i++)
+    {
+        largest = std::max(largest, abs(OutputBias[i]));
+    }
 
     for (size_t i = 0; i < INPUT_NEURONS; i++)
         for (size_t j = 0; j < HIDDEN_NEURONS; j++)
@@ -73,7 +95,7 @@ int16_t Network::QuickEval() const
     int32_t output = outputBias * PRECISION;
 
     for (size_t i = 0; i < HIDDEN_NEURONS; i++)
-        output += std::max(int16_t(0), Zeta.back()[i]) * outputWeights[i];
+        output += std::max(int32_t(0), Zeta.back()[i]) * outputWeights[i];
 
     return output / SQUARE_PRECISION;
 }
