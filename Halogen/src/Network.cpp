@@ -1,5 +1,5 @@
 #include "Network.h"
-#include "halogen-x256-eb873cf4.nn"
+#include "out.net"
 
 std::array<std::array<int16_t, HIDDEN_NEURONS>, INPUT_NEURONS> Network::hiddenWeights = {};
 std::array<int16_t, HIDDEN_NEURONS> Network::hiddenBias = {};
@@ -73,7 +73,7 @@ int16_t Network::QuickEval() const
     int32_t output = outputBias * PRECISION;
 
     for (size_t i = 0; i < HIDDEN_NEURONS; i++)
-        output += std::max(int16_t(0), Zeta.back()[i]) * outputWeights[i];
+        output += std::max(int32_t(0), Zeta.back()[i]) * outputWeights[i];
 
     return output / SQUARE_PRECISION;
 }
