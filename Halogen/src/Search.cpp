@@ -58,8 +58,10 @@ SearchResult Quiescence(Position& position, unsigned int initialDepth, int alpha
 
 void InitSearch();
 
-uint64_t SearchThread(const Position& position, const SearchParameters& parameters, const SearchLimits& limits, bool noOutput)
+uint64_t SearchThread(Position& position, const SearchParameters& parameters, const SearchLimits& limits, bool noOutput)
 {
+	position.SetEvalMode(GetBitCount(position.GetAllPieces()) > 16 ? VectorMode::DENSE : VectorMode::SPARCE);
+
 	//Probe TB at root
 	if (GetBitCount(position.GetAllPieces()) <= TB_LARGEST)
 	{

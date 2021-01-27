@@ -96,7 +96,9 @@ void Position::ApplyMove(Move move)
 	NextTurn();
 	UpdateCastleRights(move);
 	IncrementZobristKey(move);
-	net.ApplyDelta(CalculateMoveDelta(move));
+
+	if (evalMode == VectorMode::DENSE)
+		net.ApplyDelta(CalculateMoveDelta(move));
 
 	/*if (GenerateZobristKey() != key)
 	{
@@ -166,7 +168,9 @@ void Position::ApplyMove(std::string strmove)
 	}
 
 	ApplyMove(Move(prev, next, flag));
-	net.RecalculateIncremental(GetInputLayer());
+
+	if (evalMode == VectorMode::DENSE)
+		net.RecalculateIncremental(GetDenseInputLayer());
 }
 
 void Position::RevertMove()
@@ -177,7 +181,9 @@ void Position::RevertMove()
 	RestorePreviousParameters();
 	key = PreviousKeys.back();
 	PreviousKeys.pop_back();
-	net.ApplyInverseDelta();
+
+	if (evalMode == VectorMode::DENSE)
+		net.ApplyInverseDelta();
 }
 
 void Position::ApplyNullMove()
@@ -239,7 +245,7 @@ void Position::Print() const
 void Position::StartingPosition()
 {
 	InitialiseFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", "w", "KQkq", "-", "0", "1");
-	net.RecalculateIncremental(GetInputLayer());
+	net.RecalculateIncremental(GetDenseInputLayer());
 }
 
 bool Position::InitialiseFromFen(std::vector<std::string> fen)
@@ -260,7 +266,7 @@ bool Position::InitialiseFromFen(std::vector<std::string> fen)
 		return false;
 
 	key = GenerateZobristKey();
-	net.RecalculateIncremental(GetInputLayer());
+	net.RecalculateIncremental(GetDenseInputLayer());
 
 	return true;
 }
@@ -414,7 +420,24 @@ uint64_t Position::IncrementZobristKey(Move move)
 	return key;
 }
 
-std::array<int16_t, INPUT_NEURONS> Position::GetInputLayer() const
+const InputVector& Position::GetSparceInputLayer() const
+{
+	int8_t size = 0;
+
+	for (int i = 0; i < N_PIECES; i++)
+	{
+		uint64_t bb = GetPieceBB(static_cast<Pieces>(i));
+		while (bb)
+		{
+			inputs.data[size++] = modifier(i * 64 + LSBpop(bb));
+		}
+	}
+
+	inputs.size = size;
+	return inputs;
+}
+
+std::array<int16_t, INPUT_NEURONS> Position::GetDenseInputLayer() const
 {
 	std::array<int16_t, INPUT_NEURONS> ret;
 
@@ -431,7 +454,7 @@ std::array<int16_t, INPUT_NEURONS> Position::GetInputLayer() const
 	return ret;
 }
 
-deltaArray& Position::CalculateMoveDelta(Move move)
+deltaArray& Position::CalculateMoveDelta(Move move) const
 {
 	delta.size = 0;
 	if (move.IsUninitialized()) return delta;		//null move
@@ -527,7 +550,10 @@ void Position::RevertMoveQuick()
 
 int16_t Position::GetEvaluation() const
 {
-	return net.QuickEval();
+	if (evalMode == VectorMode::DENSE)
+		return net.QuickEval();
+	else
+		return net.SparceEval(GetSparceInputLayer());
 }
 
 bool Position::CheckForRep(int distanceFromRoot, int maxReps) const

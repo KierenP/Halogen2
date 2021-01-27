@@ -48,6 +48,8 @@ public:
 	void ReportDepth(int distanceFromRoot) { selDepth = std::max(distanceFromRoot, selDepth); }
 	int GetSelDepth() const { return selDepth; }
 
+	void SetEvalMode(VectorMode mode) { evalMode = mode; }
+
 private:
 	//TODO: move this to be inside of SearchData
 	int selDepth;
@@ -58,12 +60,17 @@ private:
 	uint64_t GenerateZobristKey() const;
 	uint64_t IncrementZobristKey(Move move);	
 
-	std::array<int16_t, INPUT_NEURONS> GetInputLayer() const;
-	deltaArray& CalculateMoveDelta(Move move);				//A vector which calculates the CHANGE in each input parameter
+	std::array<int16_t, INPUT_NEURONS> GetDenseInputLayer() const;
+	deltaArray& CalculateMoveDelta(Move move) const;				//A vector which calculates the CHANGE in each input parameter
 
-	static size_t modifier(size_t index);					//no inputs for pawns on front or back rank for neural net: we need to modify zobrist-like indexes
+	const InputVector& GetSparceInputLayer() const;
 
-	deltaArray delta;										//re recycle this object to save time in CalculateMoveDelta
+	static size_t modifier(size_t index);							//no inputs for pawns on front or back rank for neural net: we need to modify zobrist-like indexes
+	
+	VectorMode evalMode = VectorMode::DENSE;
+
+	mutable deltaArray delta;										//re recycle this object to save time in CalculateMoveDelta
+	mutable InputVector inputs;										//re recycle this object to save time in GetInputLayer
 	Network net;
 };
 

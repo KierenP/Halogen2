@@ -38,34 +38,34 @@ void Network::Init()
 
 void Network::RecalculateIncremental(std::array<int16_t, INPUT_NEURONS> inputs)
 {
-    Zeta.resize(1);
+    zeta.resize(1);
 
     for (size_t i = 0; i < HIDDEN_NEURONS; i++)
-        Zeta[0][i] = hiddenBias[i];
+        zeta[0][i] = hiddenBias[i];
 
     for (size_t i = 0; i < HIDDEN_NEURONS; i++)
         for (size_t j = 0; j < INPUT_NEURONS; j++)
-            Zeta[0][i] += inputs[j] * hiddenWeights[j][i];
+            zeta[0][i] += inputs[j] * hiddenWeights[j][i];
 }
 
 void Network::ApplyDelta(const deltaArray& update)
 {
-    Zeta.push_back(Zeta.back());
+    zeta.push_back(zeta.back());
 
     for (size_t i = 0; i < update.size; i++)
     {
         if (update.deltas[i].delta == 1)
             for (size_t j = 0; j < HIDDEN_NEURONS; j++)
-                Zeta.back()[j] += hiddenWeights[update.deltas[i].index][j];
+                zeta.back()[j] += hiddenWeights[update.deltas[i].index][j];
         else
             for (size_t j = 0; j < HIDDEN_NEURONS; j++)
-                Zeta.back()[j] -= hiddenWeights[update.deltas[i].index][j];
+                zeta.back()[j] -= hiddenWeights[update.deltas[i].index][j];
     }
 }
 
 void Network::ApplyInverseDelta()
 {
-    Zeta.pop_back();
+    zeta.pop_back();
 }
 
 int16_t Network::QuickEval() const
@@ -73,7 +73,26 @@ int16_t Network::QuickEval() const
     int32_t output = outputBias * PRECISION;
 
     for (size_t i = 0; i < HIDDEN_NEURONS; i++)
-        output += std::max(int16_t(0), Zeta.back()[i]) * outputWeights[i];
+        output += std::max(int16_t(0), zeta.back()[i]) * outputWeights[i];
 
+    return output / SQUARE_PRECISION;
+}
+
+void Aggregate(std::array<int16_t, HIDDEN_NEURONS>& zeta, const std::array<int16_t, HIDDEN_NEURONS>& weights)
+{
+    for (size_t i = 0; i < HIDDEN_NEURONS; i++)
+        zeta[i] += weights[i];
+}
+
+int16_t Network::SparceEval(const InputVector& inputs) const
+{
+    zeta[0] = hiddenBias;
+
+    for (int8_t i = 0; i < inputs.size; i++)
+        Aggregate(zeta[0], hiddenWeights[inputs.data[i]]);
+
+    int32_t output = outputBias * PRECISION;
+    for (size_t i = 0; i < HIDDEN_NEURONS; i++)
+        output += std::max(int16_t(0), zeta[0][i]) * outputWeights[i];
     return output / SQUARE_PRECISION;
 }
