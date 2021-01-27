@@ -1,5 +1,7 @@
 #include "Position.h"
 
+constexpr int SPARCE_EVAL_LIMIT = 12;
+
 Position::Position()
 {
 	key = EMPTY;
@@ -97,7 +99,7 @@ void Position::ApplyMove(Move move)
 	UpdateCastleRights(move);
 	IncrementZobristKey(move);
 
-	if (evalMode == VectorMode::DENSE)
+	if (GetBitCount(GetAllPieces() > SPARCE_EVAL_LIMIT))
 		net.ApplyDelta(CalculateMoveDelta(move));
 
 	/*if (GenerateZobristKey() != key)
@@ -168,22 +170,20 @@ void Position::ApplyMove(std::string strmove)
 	}
 
 	ApplyMove(Move(prev, next, flag));
-
-	if (evalMode == VectorMode::DENSE)
-		net.RecalculateIncremental(GetDenseInputLayer());
+	net.RecalculateIncremental(GetDenseInputLayer());
 }
 
 void Position::RevertMove()
 {
 	assert(PreviousKeys.size() > 0);
 
+	if (GetBitCount(GetAllPieces() > SPARCE_EVAL_LIMIT))
+		net.ApplyInverseDelta();
+
 	RestorePreviousBoard();
 	RestorePreviousParameters();
 	key = PreviousKeys.back();
 	PreviousKeys.pop_back();
-
-	if (evalMode == VectorMode::DENSE)
-		net.ApplyInverseDelta();
 }
 
 void Position::ApplyNullMove()
@@ -550,7 +550,7 @@ void Position::RevertMoveQuick()
 
 int16_t Position::GetEvaluation() const
 {
-	if (evalMode == VectorMode::DENSE)
+	if (GetBitCount(GetAllPieces() > SPARCE_EVAL_LIMIT))
 		return net.QuickEval();
 	else
 		return net.SparceEval(GetSparceInputLayer());

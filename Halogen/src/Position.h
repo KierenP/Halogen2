@@ -48,8 +48,6 @@ public:
 	void ReportDepth(int distanceFromRoot) { selDepth = std::max(distanceFromRoot, selDepth); }
 	int GetSelDepth() const { return selDepth; }
 
-	void SetEvalMode(VectorMode mode) { evalMode = mode; }
-
 private:
 	//TODO: move this to be inside of SearchData
 	int selDepth;
@@ -67,8 +65,6 @@ private:
 
 	static size_t modifier(size_t index);							//no inputs for pawns on front or back rank for neural net: we need to modify zobrist-like indexes
 	
-	VectorMode evalMode = VectorMode::DENSE;
-
 	mutable deltaArray delta;										//re recycle this object to save time in CalculateMoveDelta
 	mutable InputVector inputs;										//re recycle this object to save time in GetInputLayer
 	Network net;

@@ -60,8 +60,6 @@ void InitSearch();
 
 uint64_t SearchThread(Position& position, const SearchParameters& parameters, const SearchLimits& limits, bool noOutput)
 {
-	position.SetEvalMode(GetBitCount(position.GetAllPieces()) > 16 ? VectorMode::DENSE : VectorMode::SPARCE);
-
 	//Probe TB at root
 	if (GetBitCount(position.GetAllPieces()) <= TB_LARGEST)
 	{

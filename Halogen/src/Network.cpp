@@ -86,13 +86,13 @@ void Aggregate(std::array<int16_t, HIDDEN_NEURONS>& zeta, const std::array<int16
 
 int16_t Network::SparceEval(const InputVector& inputs) const
 {
-    zeta[0] = hiddenBias;
+    zeta.back() = hiddenBias;
 
     for (int8_t i = 0; i < inputs.size; i++)
-        Aggregate(zeta[0], hiddenWeights[inputs.data[i]]);
+        Aggregate(zeta.back(), hiddenWeights[inputs.data[i]]);
 
     int32_t output = outputBias * PRECISION;
     for (size_t i = 0; i < HIDDEN_NEURONS; i++)
-        output += std::max(int16_t(0), zeta[0][i]) * outputWeights[i];
+        output += std::max(int16_t(0), zeta.back()[i]) * outputWeights[i];
     return output / SQUARE_PRECISION;
 }
