@@ -145,6 +145,23 @@ enum GameStages
 	N_STAGES
 };
 
+constexpr int MAX_DEPTH = 100;
+
+enum Score
+{
+	HighINF = 30000,
+	LowINF = -30000,
+
+	MATED = -10000,
+	TB_LOSS_SCORE = -5000,
+	DRAW = 0,
+	TB_WIN_SCORE = 5000,
+	MATE = 10000,
+
+	MATED_IN_MAX_PLY = MATED + MAX_DEPTH,
+	MATE_IN_MAX_PLY = MATE - MAX_DEPTH,
+};
+
 void BBInit();
 
 char PieceToChar(unsigned int piece);
@@ -439,7 +456,17 @@ constexpr bool mayMove(unsigned int from, unsigned int to, uint64_t pieces)
 	return (betweenArray[from][to] & pieces) == 0;
 }
 
-const int MAX_DEPTH = 100;
+constexpr std::array<int, N_SQUARES> SquareColour =
+{
+	0, 1, 0, 1, 0, 1, 0, 1,
+	1, 0, 1, 0, 1, 0, 1, 0,
+	0, 1, 0, 1, 0, 1, 0, 1,
+	1, 0, 1, 0, 1, 0, 1, 0,
+	0, 1, 0, 1, 0, 1, 0, 1,
+	1, 0, 1, 0, 1, 0, 1, 0,
+	0, 1, 0, 1, 0, 1, 0, 1,
+	1, 0, 1, 0, 1, 0, 1, 0,
+};
 
 //--------------------------------------------------------------------------
 //Below code adapted with permission from Terje, author of Weiss.

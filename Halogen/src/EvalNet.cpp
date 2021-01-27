@@ -15,16 +15,19 @@ int EvaluatePositionNet(const Position& position, EvalCacheTable& evalTable)
 
     if (!evalTable.GetEntry(position.GetZobristKey(), eval))
     {
-        eval = position.GetEvaluation();
-
-        NetworkScaleAdjustment(eval);
-        NoPawnAdjustment(eval, position);
-        TempoAdjustment(eval, position);
+        if (!DeduceEndGame(position, eval))
+        {
+            eval = position.GetEvaluation();
+            NetworkScaleAdjustment(eval);
+            NoPawnAdjustment(eval, position);
+            TempoAdjustment(eval, position);
+            eval = std::min(4000, std::max(-4000, eval));
+        }
 
         evalTable.AddEntry(position.GetZobristKey(), eval);
     }
 
-    return std::min(4000, std::max(-4000, eval));
+    return eval;
 }
 
 void TempoAdjustment(int& eval, const Position& position)
@@ -82,6 +85,9 @@ bool DeadPosition(const Position& position)
 
     return false;
 }
+
+
+
 
 
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "Position.h"
+#include "EndGame.h"
 #include <functional>
 #include <valarray>
 #include <array>
@@ -9,7 +9,6 @@
 extern int pieceValueVector[N_STAGES][N_PIECE_TYPES];
 
 bool DeadPosition(const Position& position);
-bool IsBlockade(const Position& position);
 
 int EvaluatePositionNet(const Position& position, EvalCacheTable& evalTable);
 

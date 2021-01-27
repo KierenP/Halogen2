@@ -38,6 +38,7 @@
     <ClCompile Include="..\src\BitBoard.cpp" />
     <ClCompile Include="..\src\BitBoardDefine.cpp" />
     <ClCompile Include="..\src\BoardParameters.cpp" />
+    <ClCompile Include="..\src\EndGame.cpp" />
     <ClCompile Include="..\src\EvalCache.cpp" />
     <ClCompile Include="..\src\EvalNet.cpp" />
     <ClCompile Include="..\src\main.cpp" />
@@ -59,6 +60,7 @@
     <ClInclude Include="..\src\BitBoard.h" />
     <ClInclude Include="..\src\BitBoardDefine.h" />
     <ClInclude Include="..\src\BoardParameters.h" />
+    <ClInclude Include="..\src\EndGame.h" />
     <ClInclude Include="..\src\EvalCache.h" />
     <ClInclude Include="..\src\EvalNet.h" />
     <ClInclude Include="..\src\Move.h" />
