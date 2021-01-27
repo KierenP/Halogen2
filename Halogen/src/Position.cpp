@@ -99,7 +99,7 @@ void Position::ApplyMove(Move move)
 	UpdateCastleRights(move);
 	IncrementZobristKey(move);
 
-	if (GetBitCount(GetAllPieces()) > SPARCE_EVAL_LIMIT)
+	if (GetBitCount(GetAllPieces()) >= SPARCE_EVAL_LIMIT)
 		net.ApplyDelta(CalculateMoveDelta(move));
 
 	/*if (GenerateZobristKey() != key)
@@ -177,7 +177,7 @@ void Position::RevertMove()
 {
 	assert(PreviousKeys.size() > 0);
 
-	if (GetBitCount(GetAllPieces()) > SPARCE_EVAL_LIMIT)
+	if (GetBitCount(GetAllPieces()) >= SPARCE_EVAL_LIMIT)
 		net.ApplyInverseDelta();
 
 	RestorePreviousBoard();
