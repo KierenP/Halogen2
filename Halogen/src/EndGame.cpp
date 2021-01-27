@@ -83,7 +83,7 @@ bool DeduceEndGame(const Position& position, int& eval)
         return true;
     }
 
-    /*if (count == std::array<int, N_PIECES>({ 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1 })) //KQK
+    if (count == std::array<int, N_PIECES>({ 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1 })) //KQK
     {
         eval = EndGame<KXK>(position, WHITE);
         return true;
@@ -91,7 +91,7 @@ bool DeduceEndGame(const Position& position, int& eval)
 
     if (count == std::array<int, N_PIECES>({ 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1 })) //KQK
     {
-        eval = EndGame<KXK>(position, BLACK);
+        eval = -EndGame<KXK>(position, BLACK);
         return true;
     }
 
@@ -103,7 +103,7 @@ bool DeduceEndGame(const Position& position, int& eval)
 
     if (count == std::array<int, N_PIECES>({ 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1 })) //KBNK
     {
-        eval = EndGame<KBNK>(position, BLACK);
+        eval = -EndGame<KBNK>(position, BLACK);
         return true;
     }
 
@@ -115,9 +115,9 @@ bool DeduceEndGame(const Position& position, int& eval)
 
     if (count == std::array<int, N_PIECES>({ 0, 0, 2, 0, 0, 1, 0, 0, 0, 0, 0, 1 })) //KBBK
     {
-        eval = EndGame<KXK>(position, BLACK);   //use same strategy as rook/queen: Push to edge/corner
+        eval = -EndGame<KXK>(position, BLACK);   //use same strategy as rook/queen: Push to edge/corner
         return true;
-    }*/
+    }
 
     return false;
 }
