@@ -79,7 +79,7 @@ bool DeduceEndGame(const Position& position, int& eval)
 
     if (count == std::array<int, N_PIECES>({ 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1 })) //KRK
     {
-        eval = EndGame<KXK>(position, BLACK);
+        eval = -EndGame<KXK>(position, BLACK);
         return true;
     }
 
