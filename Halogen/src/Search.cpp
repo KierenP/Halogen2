@@ -22,8 +22,11 @@ int SNMP_coeff = 119;
 /*----------------*/
 
 constexpr int FutilityMaxDepth = 10;
-int FutilityMargins[FutilityMaxDepth];		//[depth]
-int LMR_reduction[64][64] = {};				//[depth][move number]
+int FutilityMargins[FutilityMaxDepth];						//[depth]
+int LMR_reduction[64][64] = {};								//[depth][move number]
+
+constexpr int LMPMaxDepth = 5;
+constexpr int LMP[LMPMaxDepth] = { 3, 6, 10, 15, 21 };	//[depth]
 
 void PrintBestMove(Move Best);
 bool UseTransposition(TTEntry& entry, int distanceFromRoot, int alpha, int beta);
@@ -292,6 +295,7 @@ SearchResult NegaScout(Position& position, unsigned int initialDepth, int depthR
 	int a = alpha;
 	int b = beta;
 	int searchedMoves;
+	int quietMoves = 0;
 	bool noLegalMoves = true;
 
 	//Rebel style IID. Don't ask why this helps but it does.
@@ -314,6 +318,14 @@ SearchResult NegaScout(Position& position, unsigned int initialDepth, int depthR
 		//futility pruning
 		if (IsFutile(move, beta, alpha, position, InCheck) && searchedMoves > 0 && FutileNode)	//Possibly stop futility pruning if alpha or beta are close to mate scores
 			continue;
+
+		//late move pruning
+		if (!move.IsCapture() && !move.IsPromotion())
+		{
+			quietMoves++;
+			if (depthRemaining < LMPMaxDepth && depthRemaining > 0 && quietMoves > LMP[std::max(0, depthRemaining)])
+				continue;
+		}
 
 		position.ApplyMove(move);
 		tTable.PreFetch(position.GetZobristKey());							//load the transposition into l1 cache. ~5% speedup
