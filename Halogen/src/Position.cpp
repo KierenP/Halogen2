@@ -1,6 +1,6 @@
 #include "Position.h"
 
-constexpr int SPARSE_EVAL_LIMIT = 8;
+constexpr int SPARSE_EVAL_LIMIT = 6;
 
 Position::Position()
 {
