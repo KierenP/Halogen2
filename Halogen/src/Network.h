@@ -52,6 +52,7 @@ class Network
 public:
     void RecalculateIncremental(std::array<int16_t, INPUT_NEURONS> inputs);
     void ApplyDelta(const deltaArray& update);  //incrementally update the connections between input layer and first hidden layer
+    void ApplyBlankDelta();
     void ApplyInverseDelta();                   //for un-make moves
     int16_t QuickEval() const;                  //when used with above, this just calculates starting from the alpha of first hidden layer and skips input -> hidden
 

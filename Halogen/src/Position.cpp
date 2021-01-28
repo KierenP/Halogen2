@@ -99,8 +99,10 @@ void Position::ApplyMove(Move move)
 	UpdateCastleRights(move);
 	IncrementZobristKey(move);
 
-	if (GetBitCount(GetAllPieces()) >= SPARSE_EVAL_LIMIT)
+	if (GetBitCount(GetAllPieces()) > SPARSE_EVAL_LIMIT)
 		net.ApplyDelta(CalculateMoveDelta(move));
+	if (GetBitCount(GetAllPieces()) == SPARSE_EVAL_LIMIT)
+		net.ApplyBlankDelta();
 
 	/*if (GenerateZobristKey() != key)
 	{
