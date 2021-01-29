@@ -527,7 +527,15 @@ void Position::RevertMoveQuick()
 
 int16_t Position::GetEvaluation() const
 {
-	return net.QuickEval();
+	if (GetPieceBB(WHITE_BISHOP) == 0 && GetPieceBB(WHITE_KNIGHT) == 0 && GetPieceBB(WHITE_ROOK) == 0 && GetPieceBB(WHITE_QUEEN) == 0 &&
+		GetPieceBB(BLACK_BISHOP) == 0 && GetPieceBB(BLACK_KNIGHT) == 0 && GetPieceBB(BLACK_ROOK) == 0 && GetPieceBB(BLACK_QUEEN) == 0)
+	{
+		return kp_net.Eval(GetKPInputLayer());
+	}
+	else
+	{
+		return net.QuickEval();
+	}
 }
 
 bool Position::CheckForRep(int distanceFromRoot, int maxReps) const
@@ -549,4 +557,37 @@ bool Position::CheckForRep(int distanceFromRoot, int maxReps) const
 	}
 
 	return false;
+}
+
+const InputVector& Position::GetKPInputLayer() const
+{
+	int8_t size = 0;
+	uint64_t bb;
+
+	bb = GetPieceBB(BLACK_PAWN);
+	while (bb)
+	{
+		inputs.data[size++] = 0 * 64 + LSBpop(bb);
+	}
+
+	bb = GetPieceBB(BLACK_KING);
+	while (bb)
+	{
+		inputs.data[size++] = 1 * 64 + LSBpop(bb);
+	}
+
+	bb = GetPieceBB(WHITE_PAWN);
+	while (bb)
+	{
+		inputs.data[size++] = 2 * 64 + LSBpop(bb);
+	}
+
+	bb = GetPieceBB(WHITE_KING);
+	while (bb)
+	{
+		inputs.data[size++] = 3 * 64 + LSBpop(bb);
+	}
+
+	inputs.size = size;
+	return inputs;
 }

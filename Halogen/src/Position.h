@@ -65,5 +65,9 @@ private:
 
 	deltaArray delta;										//re recycle this object to save time in CalculateMoveDelta
 	Network net;
+
+	mutable InputVector inputs;
+	const InputVector& GetKPInputLayer() const;
+	KP_Network kp_net;
 };
 
