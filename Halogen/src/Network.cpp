@@ -113,6 +113,28 @@ void KP_Network::Init()
     memcpy(OutputBias, &KP_net[(HIDDEN_NEURONS + INPUT_NEURONS * HIDDEN_NEURONS) * sizeof(float)], sizeof(float) * 1);
     memcpy(OutputWeights, &KP_net[(HIDDEN_NEURONS + INPUT_NEURONS * HIDDEN_NEURONS + 1) * sizeof(float)], sizeof(float) * HIDDEN_NEURONS);
 
+    float largest = 0;
+
+    for (int i = 0; i < INPUT_NEURONS * HIDDEN_NEURONS; i++)
+    {
+        largest = std::max(largest, abs(HiddenWeights[i]));
+    }
+
+    for (int i = 0; i < HIDDEN_NEURONS; i++)
+    {
+        largest = std::max(largest, abs(HiddenBias[i]));
+    }
+
+    for (int i = 0; i < HIDDEN_NEURONS; i++)
+    {
+        largest = std::max(largest, abs(OutputWeights[i]));
+    }
+
+    for (int i = 0; i < 1; i++)
+    {
+        largest = std::max(largest, abs(OutputBias[i]));
+    }
+
     for (size_t i = 0; i < INPUT_NEURONS; i++)
         for (size_t j = 0; j < HIDDEN_NEURONS; j++)
             hiddenWeights[i][j] = (int16_t)round(HiddenWeights[i * HIDDEN_NEURONS + j] * PRECISION);
