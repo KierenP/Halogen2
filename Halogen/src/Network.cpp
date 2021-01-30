@@ -1,6 +1,6 @@
 #include "Network.h"
 #include "halogen-x256-eb873cf4.nn"
-#include "KP-256-32-1.net"
+#include "KP-256-16-1.net"
 
 std::array<std::array<int16_t, HIDDEN_NEURONS>, INPUT_NEURONS> Network::hiddenWeights = {};
 std::array<int16_t, HIDDEN_NEURONS> Network::hiddenBias = {};

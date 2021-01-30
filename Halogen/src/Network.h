@@ -67,7 +67,7 @@ public:
 
 private:
     constexpr static size_t INPUT_NEURONS = 256;
-    constexpr static size_t HIDDEN_NEURONS = 32;
+    constexpr static size_t HIDDEN_NEURONS = 16;
 
     static void Aggregate(std::array<int16_t, HIDDEN_NEURONS>& zeta, const std::array<int16_t, HIDDEN_NEURONS>& weights);
 
