@@ -55,18 +55,18 @@ private:
 
 struct InputVector
 {
-    std::array<int16_t, 18> data = {};  //16 pawns and 2 kings
+    std::array<int16_t, N_SQUARES> data = {};  //16 pawns and 2 kings
     int8_t size = 0;
 };
 
-class KP_Network
+class KRP_Network
 {
 public:
     int16_t Eval(const InputVector& inputs) const;
     static void Init();
 
 private:
-    constexpr static size_t INPUT_NEURONS = 256;
+    constexpr static size_t INPUT_NEURONS = 64 * 6;
     constexpr static size_t HIDDEN_NEURONS = 32;
 
     static void Aggregate(std::array<int16_t, HIDDEN_NEURONS>& zeta, const std::array<int16_t, HIDDEN_NEURONS>& weights);

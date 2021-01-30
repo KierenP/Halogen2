@@ -68,6 +68,6 @@ private:
 
 	mutable InputVector inputs;
 	const InputVector& GetKPInputLayer() const;
-	KP_Network kp_net;
+	KRP_Network krp_net;
 };
 

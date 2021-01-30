@@ -1,20 +1,20 @@
 #include "Network.h"
 #include "halogen-x256-eb873cf4.nn"
-#include "KP-256-32-1.net"
+#include "KRP.net"
 
 std::array<std::array<int16_t, HIDDEN_NEURONS>, INPUT_NEURONS> Network::hiddenWeights = {};
 std::array<int16_t, HIDDEN_NEURONS> Network::hiddenBias = {};
 std::array<int16_t, HIDDEN_NEURONS> Network::outputWeights = {};
 int16_t Network::outputBias = {};
 
-std::array<std::array<int16_t, KP_Network::HIDDEN_NEURONS>, KP_Network::INPUT_NEURONS> KP_Network::hiddenWeights = {};
-std::array<int16_t, KP_Network::HIDDEN_NEURONS> KP_Network::hiddenBias = {};
-std::array<int16_t, KP_Network::HIDDEN_NEURONS> KP_Network::outputWeights = {};
-int16_t KP_Network::outputBias = {};
+std::array<std::array<int16_t, KRP_Network::HIDDEN_NEURONS>, KRP_Network::INPUT_NEURONS> KRP_Network::hiddenWeights = {};
+std::array<int16_t, KRP_Network::HIDDEN_NEURONS> KRP_Network::hiddenBias = {};
+std::array<int16_t, KRP_Network::HIDDEN_NEURONS> KRP_Network::outputWeights = {};
+int16_t KRP_Network::outputBias = {};
 
 void Network::Init()
 {
-    KP_Network::Init();
+    KRP_Network::Init();
 
     auto* HiddenWeights = new float[INPUT_NEURONS * HIDDEN_NEURONS];
     auto* HiddenBias    = new float[HIDDEN_NEURONS];
@@ -86,7 +86,7 @@ int16_t Network::QuickEval() const
     return output / SQUARE_PRECISION;
 }
 
-int16_t KP_Network::Eval(const InputVector& inputs) const
+int16_t KRP_Network::Eval(const InputVector& inputs) const
 {
     zeta = hiddenBias;
 
@@ -101,17 +101,17 @@ int16_t KP_Network::Eval(const InputVector& inputs) const
     return output / SQUARE_PRECISION;
 }
 
-void KP_Network::Init()
+void KRP_Network::Init()
 {
     auto* HiddenWeights = new float[INPUT_NEURONS * HIDDEN_NEURONS];
     auto* HiddenBias = new float[HIDDEN_NEURONS];
     auto* OutputWeights = new float[HIDDEN_NEURONS];
     auto* OutputBias = new float[1];
 
-    memcpy(HiddenBias, &KP_net[0], sizeof(float) * HIDDEN_NEURONS);
-    memcpy(HiddenWeights, &KP_net[(HIDDEN_NEURONS) * sizeof(float)], sizeof(float) * INPUT_NEURONS * HIDDEN_NEURONS);
-    memcpy(OutputBias, &KP_net[(HIDDEN_NEURONS + INPUT_NEURONS * HIDDEN_NEURONS) * sizeof(float)], sizeof(float) * 1);
-    memcpy(OutputWeights, &KP_net[(HIDDEN_NEURONS + INPUT_NEURONS * HIDDEN_NEURONS + 1) * sizeof(float)], sizeof(float) * HIDDEN_NEURONS);
+    memcpy(HiddenBias, &KRP_net[0], sizeof(float) * HIDDEN_NEURONS);
+    memcpy(HiddenWeights, &KRP_net[(HIDDEN_NEURONS) * sizeof(float)], sizeof(float) * INPUT_NEURONS * HIDDEN_NEURONS);
+    memcpy(OutputBias, &KRP_net[(HIDDEN_NEURONS + INPUT_NEURONS * HIDDEN_NEURONS) * sizeof(float)], sizeof(float) * 1);
+    memcpy(OutputWeights, &KRP_net[(HIDDEN_NEURONS + INPUT_NEURONS * HIDDEN_NEURONS + 1) * sizeof(float)], sizeof(float) * HIDDEN_NEURONS);
 
     for (size_t i = 0; i < INPUT_NEURONS; i++)
         for (size_t j = 0; j < HIDDEN_NEURONS; j++)
@@ -131,7 +131,7 @@ void KP_Network::Init()
     delete[] OutputBias;
 }
 
-void KP_Network::Aggregate(std::array<int16_t, HIDDEN_NEURONS>& zeta, const std::array<int16_t, HIDDEN_NEURONS>& weights)
+void KRP_Network::Aggregate(std::array<int16_t, HIDDEN_NEURONS>& zeta, const std::array<int16_t, HIDDEN_NEURONS>& weights)
 {
     for (size_t i = 0; i < HIDDEN_NEURONS; i++)
         zeta[i] += weights[i];

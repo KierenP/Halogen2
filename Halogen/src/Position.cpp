@@ -527,10 +527,10 @@ void Position::RevertMoveQuick()
 
 int16_t Position::GetEvaluation() const
 {
-	if (GetPieceBB(WHITE_BISHOP) == 0 && GetPieceBB(WHITE_KNIGHT) == 0 && GetPieceBB(WHITE_ROOK) == 0 && GetPieceBB(WHITE_QUEEN) == 0 &&
-		GetPieceBB(BLACK_BISHOP) == 0 && GetPieceBB(BLACK_KNIGHT) == 0 && GetPieceBB(BLACK_ROOK) == 0 && GetPieceBB(BLACK_QUEEN) == 0)
+	if (GetPieceBB(WHITE_BISHOP) == 0 && GetPieceBB(WHITE_KNIGHT) == 0 && GetPieceBB(WHITE_QUEEN) == 0 &&
+		GetPieceBB(BLACK_BISHOP) == 0 && GetPieceBB(BLACK_KNIGHT) == 0 && GetPieceBB(BLACK_QUEEN) == 0)
 	{
-		return kp_net.Eval(GetKPInputLayer());
+		return krp_net.Eval(GetKPInputLayer());
 	}
 	else
 	{
@@ -570,22 +570,34 @@ const InputVector& Position::GetKPInputLayer() const
 		inputs.data[size++] = 0 * 64 + LSBpop(bb);
 	}
 
-	bb = GetPieceBB(BLACK_KING);
+	bb = GetPieceBB(BLACK_ROOK);
 	while (bb)
 	{
 		inputs.data[size++] = 1 * 64 + LSBpop(bb);
 	}
 
-	bb = GetPieceBB(WHITE_PAWN);
+	bb = GetPieceBB(BLACK_KING);
 	while (bb)
 	{
 		inputs.data[size++] = 2 * 64 + LSBpop(bb);
 	}
 
-	bb = GetPieceBB(WHITE_KING);
+	bb = GetPieceBB(WHITE_PAWN);
 	while (bb)
 	{
 		inputs.data[size++] = 3 * 64 + LSBpop(bb);
+	}
+
+	bb = GetPieceBB(WHITE_ROOK);
+	while (bb)
+	{
+		inputs.data[size++] = 4 * 64 + LSBpop(bb);
+	}
+
+	bb = GetPieceBB(WHITE_KING);
+	while (bb)
+	{
+		inputs.data[size++] = 5 * 64 + LSBpop(bb);
 	}
 
 	inputs.size = size;
