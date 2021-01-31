@@ -8,7 +8,7 @@ void PerftSuite();
 void PrintVersion();
 uint64_t PerftDivide(unsigned int depth, Position& position);
 uint64_t Perft(unsigned int depth, Position& position);
-void Bench(int depth = 16);
+void Bench(int depth = 12);
 
 string version = "9";  
 

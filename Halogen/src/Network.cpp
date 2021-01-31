@@ -1,5 +1,5 @@
 #include "Network.h"
-#include "epoch40.net"
+#include "epoch0.net"
 
 IncrementalLayer<int16_t, int16_t, ARCHITECTURE[INPUT_LAYER],    ARCHITECTURE[HIDDEN_LAYER_1], relu<int16_t>> Network::layer1;
 Layer           <int16_t, int32_t, ARCHITECTURE[HIDDEN_LAYER_1], ARCHITECTURE[HIDDEN_LAYER_2], relu<int32_t>> Network::layer2;
