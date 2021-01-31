@@ -1,14 +1,18 @@
 #include "Network.h"
-#include "halogen-x256-eb873cf4.nn"
+#include "epoch40.net"
 
-IncrementalLayer<INPUT_TYPE,  HIDDEN_TYPE, ARCHITECTURE[INPUT_LAYER],    ARCHITECTURE[HIDDEN_LAYER_1], relu<HIDDEN_TYPE>> Network::layer1;
-Layer           <HIDDEN_TYPE, OUTPUT_TYPE, ARCHITECTURE[HIDDEN_LAYER_1], ARCHITECTURE[OUTPUT_LAYER],   nop <OUTPUT_TYPE>> Network::layer2;
+IncrementalLayer<int16_t, int16_t, ARCHITECTURE[INPUT_LAYER],    ARCHITECTURE[HIDDEN_LAYER_1], relu<int16_t>> Network::layer1;
+Layer           <int16_t, int32_t, ARCHITECTURE[HIDDEN_LAYER_1], ARCHITECTURE[HIDDEN_LAYER_2], relu<int32_t>> Network::layer2;
+Layer           <int32_t, int32_t, ARCHITECTURE[HIDDEN_LAYER_2], ARCHITECTURE[HIDDEN_LAYER_3], relu<int32_t>> Network::layer3;
+Layer           <int32_t, int32_t, ARCHITECTURE[HIDDEN_LAYER_3], ARCHITECTURE[OUTPUT_LAYER],    nop<int32_t>> Network::layer4;
 
 void Network::Init()
 {
     auto Data = reinterpret_cast<float*>(label);
     layer1.Init(Data);
     layer2.Init(Data);
+    layer3.Init(Data);
+    layer4.Init(Data);
 }
 
 template<typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, class ACTIVATION>
@@ -96,7 +100,7 @@ void Layer<T_in, T_out, INPUT, OUTPUT, ACTIVATION>::FeedForward(const std::array
     }    
 }
 
-void Network::RecalculateIncremental(std::array<INPUT_TYPE, ARCHITECTURE[INPUT_LAYER]> inputs)
+void Network::RecalculateIncremental(std::array<int16_t, ARCHITECTURE[INPUT_LAYER]> inputs)
 {
     layer1.RecalculateIncremental(inputs);
 }
@@ -111,8 +115,10 @@ void Network::ApplyInverseDelta()
     layer1.ApplyInverseDelta();
 }
 
-OUTPUT_TYPE Network::Eval() const
+int16_t Network::Eval() const
 {
     layer2.FeedForward(layer1.GetActivation());
-    return layer2.GetOutput()[0] / PRECISION;
+    layer3.FeedForward(layer2.GetOutput());
+    layer4.FeedForward(layer3.GetOutput());
+    return layer4.GetOutput()[0] / PRECISION;
 }

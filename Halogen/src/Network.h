@@ -17,10 +17,12 @@ enum
 {
     INPUT_LAYER,
     HIDDEN_LAYER_1,
-    OUTPUT_LAYER
+    HIDDEN_LAYER_2,
+    HIDDEN_LAYER_3,
+    OUTPUT_LAYER,
 };
 
-constexpr size_t ARCHITECTURE[] = { 768, 256, 1 };
+constexpr size_t ARCHITECTURE[] = { 768, 256, 32, 32, 1 };
 
 constexpr int16_t MAX_VALUE = 128;
 constexpr int16_t PRECISION = ((size_t)std::numeric_limits<int16_t>::max() + 1) / MAX_VALUE;
@@ -91,21 +93,19 @@ private:
     ACTIVATION activation;
 };
 
-typedef int16_t INPUT_TYPE;
-typedef int16_t HIDDEN_TYPE;
-typedef int32_t OUTPUT_TYPE;
-
 class Network
 {
 public:
-    void RecalculateIncremental(std::array<INPUT_TYPE, ARCHITECTURE[INPUT_LAYER]> inputs);
+    void RecalculateIncremental(std::array<int16_t, ARCHITECTURE[INPUT_LAYER]> inputs);
     void ApplyDelta(const deltaArray& update);  //incrementally update the connections between input layer and first hidden layer
     void ApplyInverseDelta();                   //for un-make moves
-    OUTPUT_TYPE Eval() const;                   //when used with above, this just calculates starting from the alpha of first hidden layer and skips input -> hidden
+    int16_t Eval() const;                   //when used with above, this just calculates starting from the alpha of first hidden layer and skips input -> hidden
 
     static void Init();
 
 private:
-    static IncrementalLayer<INPUT_TYPE,  HIDDEN_TYPE, ARCHITECTURE[INPUT_LAYER],    ARCHITECTURE[HIDDEN_LAYER_1], relu<HIDDEN_TYPE>> layer1;
-    static Layer           <HIDDEN_TYPE, OUTPUT_TYPE, ARCHITECTURE[HIDDEN_LAYER_1], ARCHITECTURE[OUTPUT_LAYER],   nop <OUTPUT_TYPE>> layer2;
+    static IncrementalLayer<int16_t, int16_t, ARCHITECTURE[INPUT_LAYER],    ARCHITECTURE[HIDDEN_LAYER_1], relu<int16_t>> layer1;
+    static Layer           <int16_t, int32_t, ARCHITECTURE[HIDDEN_LAYER_1], ARCHITECTURE[HIDDEN_LAYER_2], relu<int32_t>> layer2;
+    static Layer           <int32_t, int32_t, ARCHITECTURE[HIDDEN_LAYER_2], ARCHITECTURE[HIDDEN_LAYER_3], relu<int32_t>> layer3;
+    static Layer           <int32_t, int32_t, ARCHITECTURE[HIDDEN_LAYER_3], ARCHITECTURE[OUTPUT_LAYER],    nop<int32_t>> layer4;
 };
