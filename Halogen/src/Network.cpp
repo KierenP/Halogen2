@@ -1,5 +1,5 @@
 #include "Network.h"
-#include "epoch30.net"
+#include "epoch125.net"
 
 IncrementalLayer<int16_t, int16_t, ARCHITECTURE[INPUT_LAYER],    ARCHITECTURE[HIDDEN_LAYER_1], relu<int16_t>> Network::layer1;
 Layer           <int16_t, int32_t, ARCHITECTURE[HIDDEN_LAYER_1], ARCHITECTURE[HIDDEN_LAYER_2], relu<int32_t>> Network::layer2;
@@ -19,7 +19,7 @@ template<typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, class ACTIV
 void Layer<T_in, T_out, INPUT, OUTPUT, ACTIVATION>::Init(float*& data)
 {
     for (size_t i = 0; i < OUTPUT; i++)
-        bias[i] = (T_in)round(*data++ * PRECISION);
+        bias[i] = (T_out)round(*data++ * PRECISION);
 
     for (size_t i = 0; i < INPUT; i++)
         for (size_t j = 0; j < OUTPUT; j++)
@@ -30,7 +30,7 @@ template<typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, class ACTIV
 inline void IncrementalLayer<T_in, T_out, INPUT, OUTPUT, ACTIVATION>::Init(float*& data)
 {
     for (size_t i = 0; i < OUTPUT; i++)
-        bias[i] = (T_in)round(*data++ * PRECISION);
+        bias[i] = (T_out)round(*data++ * PRECISION);
 
     for (size_t i = 0; i < INPUT; i++)
         for (size_t j = 0; j < OUTPUT; j++)
