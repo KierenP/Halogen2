@@ -11,8 +11,8 @@ void Network::Init()
     layer2.Init(Data);
 }
 
-template<typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, class activation>
-void Layer<T_in, T_out, INPUT, OUTPUT, activation>::Init(float*& data)
+template<typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, class ACTIVATION>
+void Layer<T_in, T_out, INPUT, OUTPUT, ACTIVATION>::Init(float*& data)
 {
     for (size_t i = 0; i < OUTPUT; i++)
         bias[i] = (T_in)round(*data++ * PRECISION);
@@ -22,8 +22,8 @@ void Layer<T_in, T_out, INPUT, OUTPUT, activation>::Init(float*& data)
             weights[j][i] = (T_in)round(*data++ * PRECISION);
 }
 
-template<typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, class activation>
-inline void IncrementalLayer<T_in, T_out, INPUT, OUTPUT, activation>::Init(float*& data)
+template<typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, class ACTIVATION>
+inline void IncrementalLayer<T_in, T_out, INPUT, OUTPUT, ACTIVATION>::Init(float*& data)
 {
     for (size_t i = 0; i < OUTPUT; i++)
         bias[i] = (T_in)round(*data++ * PRECISION);
@@ -33,21 +33,18 @@ inline void IncrementalLayer<T_in, T_out, INPUT, OUTPUT, activation>::Init(float
             weights[i][j] = (T_in)round(*data++ * PRECISION);
 }
 
-template<typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, class activation>
-void IncrementalLayer<T_in, T_out, INPUT, OUTPUT, activation>::RecalculateIncremental(std::array<T_in, INPUT> inputs)
+template<typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, class ACTIVATION>
+void IncrementalLayer<T_in, T_out, INPUT, OUTPUT, ACTIVATION>::RecalculateIncremental(std::array<T_in, INPUT> inputs)
 {
-    Zeta.resize(1);
-
-    for (size_t i = 0; i < OUTPUT; i++)
-        Zeta[0][i] = bias[i];
+    Zeta = { bias };
 
     for (size_t i = 0; i < OUTPUT; i++)
         for (size_t j = 0; j < INPUT; j++)
             Zeta[0][i] += inputs[j] * weights[j][i];
 }
 
-template<typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, class activation>
-void IncrementalLayer<T_in, T_out, INPUT, OUTPUT, activation>::ApplyDelta(const deltaArray& update)
+template<typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, class ACTIVATION>
+void IncrementalLayer<T_in, T_out, INPUT, OUTPUT, ACTIVATION>::ApplyDelta(const deltaArray& update)
 {
     Zeta.push_back(Zeta.back());
 
@@ -62,49 +59,41 @@ void IncrementalLayer<T_in, T_out, INPUT, OUTPUT, activation>::ApplyDelta(const 
     }
 }
 
-template<typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, class activation>
-void IncrementalLayer<T_in, T_out, INPUT, OUTPUT, activation>::ApplyInverseDelta()
+template<typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, class ACTIVATION>
+void IncrementalLayer<T_in, T_out, INPUT, OUTPUT, ACTIVATION>::ApplyInverseDelta()
 {
     Zeta.pop_back();
 }
 
-template <typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, class activation>
-const std::array<T_out, OUTPUT>& IncrementalLayer<T_in, T_out, INPUT, OUTPUT, activation>::GetActivation()
+template <typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, class ACTIVATION>
+const std::array<T_out, OUTPUT>& IncrementalLayer<T_in, T_out, INPUT, OUTPUT, ACTIVATION>::GetActivation()
 {
-    activation function;
+    output = Zeta.back();
 
     for (size_t i = 0; i < OUTPUT; i++)
-    {   
-        output[i] = static_cast<T_out>(Zeta.back()[i]);
-        function(output[i]);
-    }
+        activation(output[i]);
 
     return output;
 }
 
-template <typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, class activation>
-const std::array<T_out, OUTPUT>& Layer<T_in, T_out, INPUT, OUTPUT, activation>::GetActivation()
+template <typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, class ACTIVATION>
+const std::array<T_out, OUTPUT>& Layer<T_in, T_out, INPUT, OUTPUT, ACTIVATION>::GetOutput()
 {
-    activation function;
+    return Zeta;
+}
+
+template<typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, typename ACTIVATION>
+void Layer<T_in, T_out, INPUT, OUTPUT, ACTIVATION>::FeedForward(const std::array<T_in, INPUT>& input)
+{
+    Zeta = bias;
 
     for (size_t i = 0; i < OUTPUT; i++)
     {
-        output[i] = static_cast<T_out>(Zeta[i]);
-        function(output[i]);
-    }
-
-    return output;
-}
-
-template<typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, typename activation>
-void Layer<T_in, T_out, INPUT, OUTPUT, activation>::FeedForward(const std::array<T_in, INPUT>& input)
-{
-    for (size_t i = 0; i < OUTPUT; i++)
-        Zeta[i] = static_cast<T_out>(bias[i]);
-
-    for (size_t i = 0; i < OUTPUT; i++)
         for (size_t j = 0; j < INPUT; j++)
-            Zeta[i] += input[j] * weights[i][j];
+            Zeta[i] += input[j] * weights[i][j] / PRECISION;
+
+        activation(Zeta[i]);
+    }    
 }
 
 void Network::RecalculateIncremental(std::array<INPUT_TYPE, ARCHITECTURE[INPUT_LAYER]> inputs)
@@ -125,5 +114,5 @@ void Network::ApplyInverseDelta()
 OUTPUT_TYPE Network::Eval() const
 {
     layer2.FeedForward(layer1.GetActivation());
-    return layer2.GetActivation()[0] / SQUARE_PRECISION;
+    return layer2.GetOutput()[0] / PRECISION;
 }

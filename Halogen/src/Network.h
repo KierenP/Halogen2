@@ -43,7 +43,7 @@ struct deltaArray
 //No activation function
 template<typename T>
 struct nop {
-    void operator()(T& i) {}
+    void operator()(T&) {}
 };
 
 //ReLU activation function
@@ -52,14 +52,11 @@ struct relu {
     void operator()(T& i) { i = std::max(T(0), i); }
 };
 
-template <typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, typename activation>
+template <typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, class ACTIVATION>
 class IncrementalLayer
 {
 public:
     void Init(float*& data);
-
-    std::array<std::array<T_in, OUTPUT>, INPUT> weights;
-    std::array<T_in, OUTPUT> bias;
 
     void RecalculateIncremental(std::array<T_in, INPUT> inputs);
     void ApplyDelta(const deltaArray& update);
@@ -68,25 +65,30 @@ public:
     const std::array<T_out, OUTPUT>& GetActivation();
 
 private:
+    std::array<std::array<T_in, OUTPUT>, INPUT> weights;
+    std::array<T_out, OUTPUT> bias;
+
     std::vector<std::array<T_out, OUTPUT>> Zeta;
     std::array<T_out, OUTPUT> output;
+
+    ACTIVATION activation;
 };
 
-template <typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, class activation>
+template <typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, class ACTIVATION>
 class Layer
 {
 public:
     void Init(float*& data);
 
-    std::array<std::array<T_in, INPUT>, OUTPUT> weights;
-    std::array<T_in, OUTPUT> bias;
-
     void FeedForward(const std::array<T_in, INPUT>& input);
-    const std::array<T_out, OUTPUT>& GetActivation();
+    const std::array<T_out, OUTPUT>& GetOutput();
 
 private:
+    std::array<std::array<T_in, INPUT>, OUTPUT> weights;
+    std::array<T_out, OUTPUT> bias;
+
     std::array<T_out, OUTPUT> Zeta;
-    std::array<T_out, OUTPUT> output;
+    ACTIVATION activation;
 };
 
 typedef int16_t INPUT_TYPE;
@@ -104,6 +106,6 @@ public:
     static void Init();
 
 private:
-    static IncrementalLayer<INPUT_TYPE, HIDDEN_TYPE, ARCHITECTURE[INPUT_LAYER], ARCHITECTURE[HIDDEN_LAYER_1], relu<HIDDEN_TYPE>> layer1;
-    static Layer<HIDDEN_TYPE, OUTPUT_TYPE, ARCHITECTURE[HIDDEN_LAYER_1], ARCHITECTURE[OUTPUT_LAYER], nop<OUTPUT_TYPE>> layer2;
+    static IncrementalLayer<INPUT_TYPE,  HIDDEN_TYPE, ARCHITECTURE[INPUT_LAYER],    ARCHITECTURE[HIDDEN_LAYER_1], relu<HIDDEN_TYPE>> layer1;
+    static Layer           <HIDDEN_TYPE, OUTPUT_TYPE, ARCHITECTURE[HIDDEN_LAYER_1], ARCHITECTURE[OUTPUT_LAYER],   nop <OUTPUT_TYPE>> layer2;
 };
