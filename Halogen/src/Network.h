@@ -13,8 +13,14 @@
 #include "EvalCache.h"
 #include "BitBoardDefine.h"
 
-constexpr size_t INPUT_NEURONS = 12 * 64;
-constexpr size_t HIDDEN_NEURONS = 256;
+enum
+{
+    INPUT_LAYER,
+    HIDDEN_LAYER_1,
+    OUTPUT_LAYER
+};
+
+constexpr size_t ARCHITECTURE[] = { 768, 256, 1 };
 
 constexpr int16_t MAX_VALUE = 128;
 constexpr int16_t PRECISION = ((size_t)std::numeric_limits<int16_t>::max() + 1) / MAX_VALUE;
@@ -34,22 +40,70 @@ struct deltaArray
     deltaPoint deltas[4];
 };
 
+//No activation function
+template<typename T>
+struct nop {
+    void operator()(T& i) {}
+};
+
+//ReLU activation function
+template<typename T>
+struct relu {
+    void operator()(T& i) { i = std::max(T(0), i); }
+};
+
+template <typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, typename activation>
+class IncrementalLayer
+{
+public:
+    void Init(float*& data);
+
+    std::array<std::array<T_in, OUTPUT>, INPUT> weights;
+    std::array<T_in, OUTPUT> bias;
+
+    void RecalculateIncremental(std::array<T_in, INPUT> inputs);
+    void ApplyDelta(const deltaArray& update);
+    void ApplyInverseDelta();
+
+    const std::array<T_out, OUTPUT>& GetActivation();
+
+private:
+    std::vector<std::array<T_out, OUTPUT>> Zeta;
+    std::array<T_out, OUTPUT> output;
+};
+
+template <typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, class activation>
+class Layer
+{
+public:
+    void Init(float*& data);
+
+    std::array<std::array<T_in, INPUT>, OUTPUT> weights;
+    std::array<T_in, OUTPUT> bias;
+
+    void FeedForward(const std::array<T_in, INPUT>& input);
+    const std::array<T_out, OUTPUT>& GetActivation();
+
+private:
+    std::array<T_out, OUTPUT> Zeta;
+    std::array<T_out, OUTPUT> output;
+};
+
+typedef int16_t INPUT_TYPE;
+typedef int16_t HIDDEN_TYPE;
+typedef int32_t OUTPUT_TYPE;
+
 class Network
 {
 public:
-    void RecalculateIncremental(std::array<int16_t, INPUT_NEURONS> inputs);
+    void RecalculateIncremental(std::array<INPUT_TYPE, ARCHITECTURE[INPUT_LAYER]> inputs);
     void ApplyDelta(const deltaArray& update);  //incrementally update the connections between input layer and first hidden layer
     void ApplyInverseDelta();                   //for un-make moves
-    int16_t QuickEval() const;                  //when used with above, this just calculates starting from the alpha of first hidden layer and skips input -> hidden
+    OUTPUT_TYPE Eval() const;                   //when used with above, this just calculates starting from the alpha of first hidden layer and skips input -> hidden
 
     static void Init();
 
 private:
-    std::vector<std::array<int16_t, HIDDEN_NEURONS>> Zeta;
-
-    static std::array<std::array<int16_t, HIDDEN_NEURONS>, INPUT_NEURONS> hiddenWeights;
-    static std::array<int16_t, HIDDEN_NEURONS> hiddenBias;
-    static std::array<int16_t, HIDDEN_NEURONS> outputWeights;
-    static int16_t outputBias;
+    static IncrementalLayer<INPUT_TYPE, HIDDEN_TYPE, ARCHITECTURE[INPUT_LAYER], ARCHITECTURE[HIDDEN_LAYER_1], relu<HIDDEN_TYPE>> layer1;
+    static Layer<HIDDEN_TYPE, OUTPUT_TYPE, ARCHITECTURE[HIDDEN_LAYER_1], ARCHITECTURE[OUTPUT_LAYER], nop<OUTPUT_TYPE>> layer2;
 };
-

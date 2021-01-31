@@ -414,9 +414,9 @@ uint64_t Position::IncrementZobristKey(Move move)
 	return key;
 }
 
-std::array<int16_t, INPUT_NEURONS> Position::GetInputLayer() const
+std::array<int16_t, ARCHITECTURE[INPUT_LAYER]> Position::GetInputLayer() const
 {
-	std::array<int16_t, INPUT_NEURONS> ret;
+	std::array<int16_t, ARCHITECTURE[INPUT_LAYER]> ret;
 
 	for (int i = 0; i < N_PIECES; i++)
 	{
@@ -527,7 +527,7 @@ void Position::RevertMoveQuick()
 
 int16_t Position::GetEvaluation() const
 {
-	return net.QuickEval();
+	return net.Eval();
 }
 
 bool Position::CheckForRep(int distanceFromRoot, int maxReps) const
