@@ -89,15 +89,17 @@ const std::array<T_out, OUTPUT>& Layer<T_in, T_out, INPUT, OUTPUT, ACTIVATION>::
 template<typename T_in, typename T_out, size_t INPUT, size_t OUTPUT, typename ACTIVATION>
 void Layer<T_in, T_out, INPUT, OUTPUT, ACTIVATION>::FeedForward(const std::array<T_in, INPUT>& input)
 {
-    Zeta = bias;
+    Zeta = {};
 
     for (size_t i = 0; i < OUTPUT; i++)
     {
         for (size_t j = 0; j < INPUT; j++)
-            Zeta[i] += input[j] * weights[i][j] / PRECISION;
+            Zeta[i] += input[j] * weights[i][j];
 
+        Zeta[i] /= PRECISION;
+        Zeta[i] += bias[i];
         activation(Zeta[i]);
-    }    
+    }
 }
 
 void Network::RecalculateIncremental(std::array<int16_t, ARCHITECTURE[INPUT_LAYER]> inputs)
