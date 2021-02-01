@@ -90,7 +90,7 @@ void Layer<T_in, T_out, INPUT, OUTPUT, ACTIVATION>::FeedForward(const std::array
     for (size_t i = 0; i < OUTPUT; i++)
     {
         for (size_t j = 0; j < INPUT; j++)
-            Zeta[i] += input[j] * weights[i][j] / PRECISION;
+            Zeta[i] += input[j] * weights[i][j];
 
         activation(Zeta[i]);
     }    
@@ -114,5 +114,5 @@ void Network::ApplyInverseDelta()
 OUTPUT_TYPE Network::Eval() const
 {
     layer2.FeedForward(layer1.GetActivation());
-    return layer2.GetOutput()[0] / PRECISION;
+    return layer2.GetOutput()[0] / SQUARE_PRECISION;
 }
