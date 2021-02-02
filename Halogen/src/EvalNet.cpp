@@ -42,7 +42,7 @@ void NoPawnAdjustment(int& eval, const Position& position)
 
 void NetworkScaleAdjustment(int& eval)
 {
-    eval = eval * 94 / 100;
+    eval = eval * 90 / 100;
 }
 
 int PieceValues(unsigned int Piece, GameStages GameStage)
