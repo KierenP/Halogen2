@@ -5,7 +5,6 @@ int pieceValueVector[N_STAGES][N_PIECE_TYPES] = { {91, 532, 568, 715, 1279, 5000
 
 constexpr int TEMPO = 10;
 
-void NetworkScaleAdjustment(int& eval);
 void TempoAdjustment(int& eval, const Position& position);
 void NoPawnAdjustment(int& eval, const Position& position);
 
@@ -17,7 +16,6 @@ int EvaluatePositionNet(const Position& position, EvalCacheTable& evalTable)
     {
         eval = position.GetEvaluation();
 
-        NetworkScaleAdjustment(eval);
         NoPawnAdjustment(eval, position);
         TempoAdjustment(eval, position);
 
@@ -38,11 +36,6 @@ void NoPawnAdjustment(int& eval, const Position& position)
         eval /= 2;
     if (eval < 0 && position.GetPieceBB(PAWN, BLACK) == 0)
         eval /= 2;
-}
-
-void NetworkScaleAdjustment(int& eval)
-{
-    eval = eval * 94 / 100;
 }
 
 int PieceValues(unsigned int Piece, GameStages GameStage)
