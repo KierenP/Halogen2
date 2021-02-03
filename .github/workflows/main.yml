@@ -15,7 +15,8 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-
+        with:
+          submodules: recursive
       - name: Create PGO build
         run: |
          cd Halogen
@@ -34,7 +35,8 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-
+        with:
+          submodules: recursive
       - name: Create static compiles
         run: |
          cd Halogen
@@ -49,7 +51,8 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-
+        with:
+          submodules: recursive
       - name: Create sanitizer builds
         run: |
           cd Halogen
