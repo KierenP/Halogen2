@@ -17,10 +17,21 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
+          
+          
+      - name: Test if submodules are working
+        run: |
+         cd Halogen
+         cd src
+         ls
+         cd Pyrrhic
+         ls
+         
       - name: Create PGO build
         run: |
          cd Halogen
          cd src
+         ls
          make
           
       - name: Run bench
