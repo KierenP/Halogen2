@@ -60,8 +60,12 @@ void InitSearch();
 
 uint64_t SearchThread(const Position& position, const SearchParameters& parameters, const SearchLimits& limits, bool noOutput)
 {
-	//Probe TB at root
-	if (GetBitCount(position.GetAllPieces()) <= TB_LARGEST)
+	//Probe TB at root as long as we have no casteling rights
+	if (GetBitCount(position.GetAllPieces()) <= TB_LARGEST 
+		&& position.GetCanCastleWhiteKingside() == false 
+		&& position.GetCanCastleBlackKingside() == false 
+		&& position.GetCanCastleWhiteQueenside() == false
+		&& position.GetCanCastleBlackQueenside() == false)
 	{
 		unsigned int result = ProbeTBRoot(position);
 		if (result != TB_RESULT_FAILED)
@@ -196,9 +200,12 @@ SearchResult NegaScout(Position& position, unsigned int initialDepth, int depthR
 	int Score = LowINF;
 	int MaxScore = HighINF;
 
-	//Probe TB in search
-	if (   distanceFromRoot > 0   
-		&& position.GetFiftyMoveCount() == 0 
+	//Probe TB in search if fifty move count is zero, we have no casteling rights, and have at most TB_LARGEST pieces left
+	if (   position.GetFiftyMoveCount() == 0
+		&& position.GetCanCastleWhiteKingside() == false
+		&& position.GetCanCastleBlackKingside() == false
+		&& position.GetCanCastleWhiteQueenside() == false
+		&& position.GetCanCastleBlackQueenside() == false
 		&& GetBitCount(position.GetAllPieces()) <= TB_LARGEST)
 	{
 		unsigned int result = ProbeTBSearch(position);
@@ -383,7 +390,6 @@ unsigned int ProbeTBRoot(const Position& position)
 		position.GetPieceBB(WHITE_KNIGHT) | position.GetPieceBB(BLACK_KNIGHT),
 		position.GetPieceBB(WHITE_PAWN) | position.GetPieceBB(BLACK_PAWN),
 		position.GetFiftyMoveCount(),
-		position.GetCanCastleBlackKingside() * TB_CASTLING_k + position.GetCanCastleBlackQueenside() * TB_CASTLING_q + position.GetCanCastleWhiteKingside() * TB_CASTLING_K + position.GetCanCastleWhiteQueenside() * TB_CASTLING_Q,
 		position.GetEnPassant() <= SQ_H8 ? position.GetEnPassant() : 0,
 		position.GetTurn(),
 		NULL);
@@ -398,8 +404,6 @@ unsigned int ProbeTBSearch(const Position& position)
 		position.GetPieceBB(WHITE_BISHOP) | position.GetPieceBB(BLACK_BISHOP),
 		position.GetPieceBB(WHITE_KNIGHT) | position.GetPieceBB(BLACK_KNIGHT),
 		position.GetPieceBB(WHITE_PAWN) | position.GetPieceBB(BLACK_PAWN),
-		position.GetFiftyMoveCount(),											
-		position.GetCanCastleBlackKingside() * TB_CASTLING_k + position.GetCanCastleBlackQueenside() * TB_CASTLING_q + position.GetCanCastleWhiteKingside() * TB_CASTLING_K + position.GetCanCastleWhiteQueenside() * TB_CASTLING_Q,
 		position.GetEnPassant() <= SQ_H8 ? position.GetEnPassant() : 0,
 		position.GetTurn());
 }
