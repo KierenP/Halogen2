@@ -291,9 +291,9 @@ void PawnPromotions(Position& position, std::vector<Move>& moves, uint64_t pinne
 			continue;
 
 		moves.push_back(move);
-		moves.emplace_back(Move(start, end, ROOK_PROMOTION));
-		moves.emplace_back(Move(start, end, BISHOP_PROMOTION));
-		moves.emplace_back(Move(start, end, QUEEN_PROMOTION));
+		moves.emplace_back(start, end, ROOK_PROMOTION);
+		moves.emplace_back(start, end, BISHOP_PROMOTION);
+		moves.emplace_back(start, end, QUEEN_PROMOTION);
 	}
 }
 
@@ -373,10 +373,10 @@ void PawnCaptures(Position& position, std::vector<Move>& moves, uint64_t pinned)
 
 		if (GetRank(end) == RANK_1 || GetRank(end) == RANK_8)
 		{
-			moves.emplace_back(Move(start, end, KNIGHT_PROMOTION_CAPTURE));
-			moves.emplace_back(Move(start, end, ROOK_PROMOTION_CAPTURE));
-			moves.emplace_back(Move(start, end, BISHOP_PROMOTION_CAPTURE));
-			moves.emplace_back(Move(start, end, QUEEN_PROMOTION_CAPTURE));
+			moves.emplace_back(start, end, KNIGHT_PROMOTION_CAPTURE);
+			moves.emplace_back(start, end, ROOK_PROMOTION_CAPTURE);
+			moves.emplace_back(start, end, BISHOP_PROMOTION_CAPTURE);
+			moves.emplace_back(start, end, QUEEN_PROMOTION_CAPTURE);
 		}
 		else
 			moves.push_back(move);
@@ -393,10 +393,10 @@ void PawnCaptures(Position& position, std::vector<Move>& moves, uint64_t pinned)
 
 		if (GetRank(end) == RANK_1 || GetRank(end) == RANK_8)
 		{
-			moves.emplace_back(Move(start, end, KNIGHT_PROMOTION_CAPTURE));
-			moves.emplace_back(Move(start, end, ROOK_PROMOTION_CAPTURE));
-			moves.emplace_back(Move(start, end, BISHOP_PROMOTION_CAPTURE));
-			moves.emplace_back(Move(start, end, QUEEN_PROMOTION_CAPTURE));
+			moves.emplace_back(start, end, KNIGHT_PROMOTION_CAPTURE);
+			moves.emplace_back(start, end, ROOK_PROMOTION_CAPTURE);
+			moves.emplace_back(start, end, BISHOP_PROMOTION_CAPTURE);
+			moves.emplace_back(start, end, QUEEN_PROMOTION_CAPTURE);
 		}
 		else
 			moves.push_back(move);
@@ -413,7 +413,7 @@ void CastleMoves(const Position& position, std::vector<Move>& moves)
 		{
 			if (!IsSquareThreatened(position, SQ_E1, position.GetTurn()) && !IsSquareThreatened(position, SQ_F1, position.GetTurn()) && !IsSquareThreatened(position, SQ_G1, position.GetTurn()))
 			{
-				moves.emplace_back(Move(SQ_E1, SQ_G1, KING_CASTLE));
+				moves.emplace_back(SQ_E1, SQ_G1, KING_CASTLE);
 			}
 		}
 	}
@@ -424,7 +424,7 @@ void CastleMoves(const Position& position, std::vector<Move>& moves)
 		{
 			if (!IsSquareThreatened(position, SQ_E1, position.GetTurn()) && !IsSquareThreatened(position, SQ_D1, position.GetTurn()) && !IsSquareThreatened(position, SQ_C1, position.GetTurn()))
 			{
-				moves.emplace_back(Move(SQ_E1, SQ_C1, QUEEN_CASTLE));
+				moves.emplace_back(SQ_E1, SQ_C1, QUEEN_CASTLE);
 			}
 		}
 	}
@@ -435,7 +435,7 @@ void CastleMoves(const Position& position, std::vector<Move>& moves)
 		{
 			if (!IsSquareThreatened(position, SQ_E8, position.GetTurn()) && !IsSquareThreatened(position, SQ_F8, position.GetTurn()) && !IsSquareThreatened(position, SQ_G8, position.GetTurn()))
 			{
-				moves.emplace_back(Move(SQ_E8, SQ_G8, KING_CASTLE));
+				moves.emplace_back(SQ_E8, SQ_G8, KING_CASTLE);
 			}
 		}
 	}
@@ -446,7 +446,7 @@ void CastleMoves(const Position& position, std::vector<Move>& moves)
 		{
 			if (!IsSquareThreatened(position, SQ_E8, position.GetTurn()) && !IsSquareThreatened(position, SQ_D8, position.GetTurn()) && !IsSquareThreatened(position, SQ_C8, position.GetTurn()))
 			{
-				moves.emplace_back(Move(SQ_E8, SQ_C8, QUEEN_CASTLE));
+				moves.emplace_back(SQ_E8, SQ_C8, QUEEN_CASTLE);
 			}
 		}
 	}
