@@ -1,44 +1,34 @@
 #include "EvalCache.h"
 
-constexpr size_t TableSize = 65536;
+//1MB in size
+constexpr size_t TableSize = 1024 * 1024 / sizeof(EvalCacheEntry);
 
-EvalCacheTable::EvalCacheTable()
-{
-	for (size_t i = 0; i < TableSize; i++)
-		table.push_back({});
-}
-
-EvalCacheTable::~EvalCacheTable()
-{
-}
+//mask to get the lower 32 bits
+constexpr size_t MASK = 0xffffffff;	
 
 void EvalCacheTable::AddEntry(uint64_t key, int eval)
 {
-	table[key % TableSize].key = key;
-	table[key % TableSize].eval = eval;
+	uint64_t index = key % TableSize;
+	table[index].key = key & MASK;
+	table[index].eval = eval;
 }
 
 bool EvalCacheTable::GetEntry(uint64_t key, int& eval)
 {
-	if (table[key % TableSize].key != key)
+	uint64_t index = key % TableSize;
+	if (table[index].key != (key & MASK))
 	{
-		misses++;
 		return false;
 	}
-
-	eval = table[key % TableSize].eval;
-	hits++; 
-
-	return true;
+	else
+	{
+		eval = table[index].eval;
+		return true;
+	}
 }
 
 void EvalCacheTable::Reset()
 {
-	hits = 0;
-	misses = 0;
-
-	for (size_t i = 0; i < TableSize; i++)
-	{
-		table[i] = {};
-	}
+	table.clear();
+	table.resize(TableSize);
 }
