@@ -18,7 +18,6 @@ int main(int argc, char* argv[])
 	tb_init("<empty>");
 
 	ZobristInit();
-	BBInit();
 	Network::Init();
 
 	string Line;					//to read the command given by the GUI
